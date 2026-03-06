@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #0B0F19;
+  --color-card: #111827;
+  --color-border: #1F2937;
+  --color-primary: #3B82F6;
+  --color-scam: #EF4444;
+  --color-warning: #F59E0B;
+  --color-safe: #10B981;
+  --color-text-primary: #E5E7EB;
+  --color-text-secondary: #9CA3AF;
+
+  --font-inter: "Inter", sans-serif;
+
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+
+  --animate-scanning: scanning 2s linear infinite;
+
+  @keyframes scanning {
+    from {
+      transform: translateY(-100%);
+    }
+
+    to {
+      transform: translateY(100%);
+    }
+  }
+}
+
+:root {
+  --background: #0B0F19;
+  --foreground: #E5E7EB;
+  --card: #111827;
+  --card-foreground: #E5E7EB;
+  --primary: #3B82F6;
+
+  .status-pill-danger {
+    @apply bg-[var(--danger)]/10 border-[var(--danger)]/20 text-[var(--danger)];
+  }
+
+  .status-pill-primary {
+    @apply bg-[var(--primary)]/10 border-[var(--primary)]/20 text-[var(--primary)];
+  }
+
+  /* Minimal Scrollbar */
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-zinc-800 rounded-full;
+  }
+
+  /* Clean Navigation */
+  .nav-item-active {
+    @apply bg-zinc-800/50 text-white;
+  }
+
+  .nav-item-hover {
+    @apply hover:bg-zinc-800/30 hover:text-white transition-colors;
+  }
+}
+
+/* Transitions */
+.transition-standard {
+  @apply transition-all duration-200 ease-in-out;
+}
+
+/* Subtle Neural Grid */
+.neural-grid {
+  background-image: radial-gradient(circle, #27272A 0.5px, transparent 0.5px);
+  background-size: 32px 32px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
