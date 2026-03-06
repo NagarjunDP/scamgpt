@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import Hero from '@/components/landing/Hero';
 import Features from '@/components/landing/Features';
@@ -10,11 +11,20 @@ import AnalysisResult from '@/components/landing/AnalysisResult';
 import AnalysisLoader from '@/components/AnalysisLoader';
 import Footer from '@/components/layout/Footer';
 
-export default function Home() {
+function HomeContent() {
+  const searchParams = useSearchParams();
   const [status, setStatus] = useState<'idle' | 'loading' | 'result'>('idle');
   const [analysisResult, setAnalysisResult] = useState<any>(null);
+  const [activeType, setActiveType] = useState('url');
 
-  const handleAnalyze = async (text: string) => {
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab && ['url', 'email', 'transaction'].includes(tab)) {
+      setActiveType(tab);
+    }
+  }, [searchParams]);
+
+  const handleAnalyze = async (text: string, type: string = activeType) => {
     if (!text.trim()) return;
 
     setStatus('loading');
@@ -23,7 +33,7 @@ export default function Home() {
     try {
       const response = await axios.post('http://localhost:8000/analyze', {
         input_text: text,
-        type: 'url' // Auto-detected in backend
+        type: type
       });
 
       // Simulate slightly longer processing for premium feel if fast
@@ -37,8 +47,8 @@ export default function Home() {
         // Fallback mock for demo if backend is down
         const mockResult = {
           threat_level: "High",
-          attack_type: "Phishing",
-          reasoning: "Detected anomalous communication patterns with high urgency and suspicious domain origin. The content mimics banking institutions to solicit sensitive PII via a newly registered domain (3 days old).",
+          attack_type: type.toUpperCase(),
+          reasoning: `Detected anomalous ${type} patterns with high urgency and suspicious origin. The content mimics official institutions to solicit sensitive data.`,
           risk_score: 0.82,
           prediction: 1,
           pattern_memory: { similarity: 0.76, match_count: 142, status: "Campaign Match" }
@@ -59,7 +69,11 @@ export default function Home() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <Hero onAnalyze={handleAnalyze} isLoading={false} />
+            <Hero
+              onAnalyze={handleAnalyze}
+              isLoading={false}
+              initialType={activeType}
+            />
             <Features />
             <DashboardPreview />
           </motion.div>
@@ -76,7 +90,7 @@ export default function Home() {
             <div className="w-full max-w-xl p-8">
               <AnalysisLoader />
               <p className="mt-8 text-center text-zinc-500 text-xs font-bold uppercase tracking-[0.3em] animate-pulse">
-                Synchronizing with Local Threat Vector DB...
+                Neural Scan in Progress...
               </p>
             </div>
           </motion.div>
@@ -102,5 +116,17 @@ export default function Home() {
 
       <Footer />
     </main>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <AnalysisLoader />
+      </div>
+    }>
+      <HomeContent />
+    </Suspense>
   );
 }

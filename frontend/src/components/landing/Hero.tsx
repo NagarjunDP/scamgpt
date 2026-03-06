@@ -2,22 +2,37 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, ArrowRight, Terminal, Shield, Zap, Lock } from 'lucide-react';
+import { Search, ArrowRight, Terminal, Shield, Zap, Lock, Mail, CreditCard, Fingerprint } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
 
 interface HeroProps {
-    onAnalyze: (text: string) => void;
+    onAnalyze: (text: string, type: string) => void;
     isLoading: boolean;
+    initialType?: string;
 }
 
-export default function Hero({ onAnalyze, isLoading }: HeroProps) {
+const SCAN_TYPES = [
+    { id: 'url', label: 'URL Intelligence', icon: Search, placeholder: 'Paste suspicious link (e.g. hdfc-kyc.io/update)...' },
+    { id: 'email', label: 'Email Intelligence', icon: Fingerprint, placeholder: 'Paste suspicious email sender or body text...' },
+    { id: 'transaction', label: 'Payment Analysis', icon: CreditCard, placeholder: 'Enter transaction ID, UPI details or payment link...' },
+];
+
+export default function Hero({ onAnalyze, isLoading, initialType = 'url' }: HeroProps) {
     const [input, setInput] = useState('');
+    const [activeType, setActiveType] = useState(initialType);
+
+    // Update activeType if initialType changes (e.g. from query param)
+    React.useEffect(() => {
+        if (initialType) setActiveType(initialType);
+    }, [initialType]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (input.trim()) onAnalyze(input);
+        if (input.trim()) onAnalyze(input, activeType);
     };
+
+    const activeTypeData = SCAN_TYPES.find(t => t.id === activeType) || SCAN_TYPES[0];
 
     return (
         <div className="relative pt-32 pb-20 px-6 overflow-hidden">
@@ -53,11 +68,30 @@ export default function Hero({ onAnalyze, isLoading }: HeroProps) {
                     className="max-w-2xl mx-auto"
                 >
                     <div className="glass rounded-2xl p-1 shadow-2xl glow-blue transition-standard hover:border-primary/30">
+                        {/* Type Tabs */}
+                        <div className="flex gap-1 p-1 border-b border-white/5">
+                            {SCAN_TYPES.map((type) => (
+                                <button
+                                    key={type.id}
+                                    onClick={() => setActiveType(type.id)}
+                                    className={cn(
+                                        "flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-standard",
+                                        activeType === type.id
+                                            ? "bg-white/10 text-white shadow-lg"
+                                            : "text-zinc-500 hover:text-zinc-300 hover:bg-white/5"
+                                    )}
+                                >
+                                    <type.icon className="w-3.5 h-3.5" />
+                                    {type.label}
+                                </button>
+                            ))}
+                        </div>
+
                         <form onSubmit={handleSubmit} className="relative">
                             <textarea
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
-                                placeholder="Paste suspicious message, payment link, email, or URL..."
+                                placeholder={activeTypeData.placeholder}
                                 className="w-full bg-transparent border-none outline-none text-white text-base p-6 min-h-[140px] placeholder:text-zinc-600 resize-none font-medium leading-relaxed"
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handleSubmit(e);
@@ -72,7 +106,7 @@ export default function Hero({ onAnalyze, isLoading }: HeroProps) {
                                     </div>
                                     <div className="flex items-center gap-1.5">
                                         <Zap className="w-3.5 h-3.5" />
-                                        <span className="text-[10px] font-bold uppercase tracking-widest">Low Latency</span>
+                                        <span className="text-[10px] font-bold uppercase tracking-widest">Neural Sync</span>
                                     </div>
                                 </div>
 
@@ -91,15 +125,15 @@ export default function Hero({ onAnalyze, isLoading }: HeroProps) {
                     <div className="mt-6 flex justify-center gap-8 opacity-40">
                         <div className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 bg-safe rounded-full" />
-                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">URL Phishing</span>
+                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Campaign Sync</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 bg-warning rounded-full" />
-                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Payment Scams</span>
+                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Reputation Check</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 bg-scam rounded-full" />
-                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Social Engineering</span>
+                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Cognitive Verify</span>
                         </div>
                     </div>
                 </motion.div>

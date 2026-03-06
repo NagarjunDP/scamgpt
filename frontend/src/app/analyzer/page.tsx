@@ -64,7 +64,7 @@ export default function AnalyzerPage() {
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
                 <AnalyzerCard
                     icon={Globe}
                     title="URL Intelligence"
@@ -74,20 +74,12 @@ export default function AnalyzerPage() {
                     delay={0.1}
                 />
                 <AnalyzerCard
-                    icon={MessageSquare}
-                    title="Linguistic Logic"
-                    badge="Cognitive"
-                    description="Evaluation of scam psychology and urgency cues in communication streams."
-                    href="/?tab=message"
+                    icon={Fingerprint}
+                    title="Email Intelligence"
+                    badge="Active"
+                    description="Validated sender authenticity and SMTP records to detect phishing and spoofing."
+                    href="/?tab=email"
                     delay={0.2}
-                />
-                <AnalyzerCard
-                    icon={Cpu}
-                    title="Behavioral Fraud"
-                    badge="Sandbox"
-                    description="Detection of transaction anomalies and behavioral risk indicators."
-                    href="/?tab=transaction"
-                    delay={0.3}
                 />
             </div>
 

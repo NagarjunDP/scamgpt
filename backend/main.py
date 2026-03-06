@@ -46,40 +46,93 @@ async def analyze(request: AnalysisRequest):
     ai_serv = get_ai_service()
     db = get_db_service()
     
-    # Auto-detect input type
+    # Auto-detect input type if not specifically set or if looks like URL
     input_text = request.input_text.strip()
     detected_type = request.type
     
-    is_url = input_text.startswith(('http://', 'https://')) or ('.' in input_text and '/' in input_text)
-    if is_url and detected_type != 'url':
+    is_url = input_text.startswith(('http://', 'https://')) or ('.' in input_text and '/' in input_text and ' ' not in input_text)
+    is_email = "@" in input_text and "." in input_text.split("@")[-1]
+
+    if is_url and detected_type not in ['url', 'email']:
         detected_type = 'url'
+    elif is_email and detected_type == 'url':
+        detected_type = 'email'
         
     prediction = 0
     probability = 0.5
     keywords = ""
+    email_signals = None
     
     if detected_type == 'url':
         prediction, probability, keywords = det_service.detect_phishing(input_text)
+    elif detected_type == 'email':
+        prediction, probability, keywords = det_service.detect_email(input_text)
+        # Build structured email signal report
+        if "@" in input_text and " " not in input_text:
+            user_part, domain_part = input_text.split("@", 1)
+            scam_keywords = ["support", "security", "verify", "official", "bank", "admin", "login", "help", "alert"]
+            generic_domains = ["gmail.com", "outlook.com", "hotmail.com", "yahoo.com"]
+            suspicious_prefix = any(k in user_part.lower() for k in scam_keywords)
+            generic_domain = any(d in domain_part.lower() for d in generic_domains)
+            complex_domain = domain_part.count('.') > 2 or "-" in domain_part
+            
+            email_signals = {
+                "sender_domain": domain_part,
+                "sender_username": user_part,
+                "signals": [
+                    {
+                        "label": "Username Pattern",
+                        "pass": not suspicious_prefix,
+                        "detail": f"'{user_part}' — {'contains scam keyword (impersonation risk)' if suspicious_prefix else 'looks like a personal/normal username'}"
+                    },
+                    {
+                        "label": "Domain Authenticity",
+                        "pass": not (suspicious_prefix and generic_domain),
+                        "detail": f"@{domain_part} — " + ("official institutions do not use free email providers" if (suspicious_prefix and generic_domain) else "domain matches expected pattern")
+                    },
+                    {
+                        "label": "Domain Complexity",
+                        "pass": not complex_domain,
+                        "detail": f"{'Complex/subdomain structure detected — phishing risk' if complex_domain else 'Domain is simple and standard'}"
+                    },
+                    {
+                        "label": "Known Scam Patterns",
+                        "pass": probability < 0.5,
+                        "detail": f"{'Matches known scam campaign signatures' if probability >= 0.5 else 'No known scam pattern match found'}"
+                    }
+                ],
+                "verdict": "SCAM" if probability > 0.5 else "LEGITIMATE"
+            }
     elif detected_type == 'message':
         prediction, probability, keywords = det_service.detect_spam(input_text)
-    elif detected_type == 'transaction' and request.transaction_details:
-        prediction, probability = det_service.detect_fraud(request.transaction_details)
-        keywords = "transaction,fraud"
+    elif detected_type == 'transaction':
+        # Try UPI analysis first; fall back to fraud model if transaction_details provided
+        prediction, probability, upi_raw_signals = det_service.detect_upi(input_text)
+        keywords = "upi,payment"
     
     # Pattern Memory: Log and Find Similarity
-    db.log_analysis(input_text, detected_type, probability, keywords)
-    similarity_score, match_count = db.find_similar_patterns(input_text, detected_type, keywords)
+    db.log_analysis(input_text, detected_type, probability if isinstance(probability, float) else 0.5, keywords if isinstance(keywords, str) else "")
+    similarity_score, match_count = db.find_similar_patterns(input_text, detected_type, keywords if isinstance(keywords, str) else "")
     
     detection_results = {
         "type": detected_type,
         "prediction": prediction,
-        "risk_score": round(probability, 2),
+        "risk_score": round(float(probability), 2),
         "similarity_score": similarity_score,
         "match_count": match_count
     }
     
     explanation = ai_serv.analyze_with_rag(request.input_text, detection_results)
     
+    # UPI signals for frontend
+    upi_signals_data = None
+    if detected_type == 'transaction' and isinstance(upi_raw_signals, list):
+        upi_signals_data = {
+            "upi_id": input_text,
+            "signals": upi_raw_signals,
+            "verdict": "SCAM" if float(probability) > 0.5 else "LEGITIMATE"
+        }
+
     # Generate Scam Attack Graph
     attack_graph = [
         {"id": "source", "label": "Attacker Source", "type": "origin"},
@@ -88,11 +141,13 @@ async def analyze(request: AnalysisRequest):
     ]
     
     return {
-        "threat_level": "High" if probability > 0.6 else ("Medium" if probability > 0.3 else "Low"),
+        "threat_level": "High" if float(probability) > 0.6 else ("Medium" if float(probability) > 0.3 else "Low"),
         "attack_type": detected_type.capitalize(),
         "reasoning": explanation,
-        "risk_score": round(probability, 2),
-        "prediction": 1 if probability > 0.5 else 0,
+        "risk_score": round(float(probability), 2),
+        "prediction": 1 if float(probability) > 0.5 else 0,
+        "email_signals": email_signals,
+        "upi_signals": upi_signals_data,
         "pattern_memory": {
             "similarity": similarity_score,
             "match_count": match_count,

@@ -24,11 +24,11 @@ class AIService:
         atype = results.get('type', 'unknown')
         
         if prob > 0.6:
-            return f"🚨 HIGH RISK DETECTED: Our engine flagged this {atype} as dangerous due to multiple threat indicators. Structural patterns match known phishing/fraud campaigns. We detected brand impersonation and suspicious URL construction. \n\n### Recommendation\nDO NOT INTERACT. This is likely a financial fraud or data theft attempt."
+            return f"🚨 SCAM DETECTED: Our engine flagged this {atype} as dangerous due to multiple threat indicators. Structural patterns match known phishing/fraud campaigns. \n\n### Recommendation\nDO NOT INTERACT. This is a fraud attempt."
         elif prob > 0.3:
-            return f"⚠️ CAUTION: This {atype} shows moderately suspicious characteristics. While not a definitive threat, its construction resembles patterns used in mass-spam or social engineering campaigns. \n\n### Recommendation\nExercise extreme caution. Verify the sender/source independently before sharing any information."
+            return f"⚠️ CAUTION: This {atype} shows moderately suspicious characteristics. While not a definitive scam, it resembles patterns used in social engineering. \n\n### Recommendation\nExercise extreme caution. Verify the sender independently."
         else:
-            return f"✅ LOW RISK: This {atype} appears to be safe. It does not match current known scam patterns and follows legitimate structural standards. \n\n### Recommendation\nYou can proceed, but always stay vigilant with digital interactions."
+            return f"✅ VERIFIED LEGITIMATE: This {atype} appears to be safe. It does not match current known scam patterns and follows legitimate standards. \n\n### Recommendation\nYou can proceed safely, but always stay vigilant."
 
     def generate_explanation(self, input_data, detection_results, context=""):
         if not self.client:

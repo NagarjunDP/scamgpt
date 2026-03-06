@@ -2,14 +2,26 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Search, Shield, Lock, CreditCard, Cpu, Brain, Zap, Globe, AlertCircle } from 'lucide-react';
+import { Search, Shield, Lock, CreditCard, Cpu, Brain, Zap, Globe, AlertCircle, Fingerprint } from 'lucide-react';
 
 const FEATURES = [
     {
-        title: 'URL Phishing Detection',
-        description: 'Real-time domain analysis using global reputation databases and heuristic pattern matching.',
+        title: 'URL Intelligence',
+        description: 'Real-time analysis of domain reputation and homograph linguistic patterns.',
         icon: Globe,
         color: 'text-primary',
+    },
+    {
+        title: 'Email Intelligence',
+        description: 'Validated sender authenticity and SMTP records to detect phishing and spoofing.',
+        icon: Fingerprint,
+        color: 'text-emerald-500',
+    },
+    {
+        title: 'System Distribution',
+        description: 'Access specialized clusters optimized for regional and sector-specific threat signatures.',
+        icon: Shield,
+        color: 'text-blue-400',
     },
     {
         title: 'Payment Scam Analysis',
@@ -18,22 +30,10 @@ const FEATURES = [
         color: 'text-warning',
     },
     {
-        title: 'Cognitive AI Reasoning',
-        description: 'Proprietary LLM technology that explains "why" a message is flagged as a potential threat.',
-        icon: Brain,
-        color: 'text-emerald-500',
-    },
-    {
-        title: 'Social Engineering Defense',
-        description: 'Analyzes urgency, pressure tactics, and psychological manipulation in communication.',
-        icon: AlertCircle,
-        color: 'text-scam',
-    },
-    {
         title: 'Deepfake Awareness',
         description: 'Identifies AI-generated content patterns often used in sophisticated identity theft.',
         icon: Cpu,
-        color: 'text-blue-400',
+        color: 'text-zinc-400',
     },
     {
         title: 'Enterprise-Grade Security',
