@@ -1,62 +1,40 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --color-background-base: #09090B;
-  --color-card-base: #111113;
-  --color-border-base: #27272A;
-  --color-primary-base: #3B82F6;
-  --color-danger-base: #EF4444;
-  --color-warning-base: #F59E0B;
-  --color-success-base: #10B981;
+  --color-background: #0B0F19;
+  --color-card: #111827;
+  --color-border: #1F2937;
+  --color-primary: #3B82F6;
+  --color-scam: #EF4444;
+  --color-warning: #F59E0B;
+  --color-safe: #10B981;
+  --color-text-primary: #E5E7EB;
+  --color-text-secondary: #9CA3AF;
+
+  --font-inter: "Inter", sans-serif;
+
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+
+  --animate-scanning: scanning 2s linear infinite;
+
+  @keyframes scanning {
+    from {
+      transform: translateY(-100%);
+    }
+
+    to {
+      transform: translateY(100%);
+    }
+  }
 }
 
 :root {
-  --background: #09090B;
-  --card: #111113;
-  --border: #27272A;
+  --background: #0B0F19;
+  --foreground: #E5E7EB;
+  --card: #111827;
+  --card-foreground: #E5E7EB;
   --primary: #3B82F6;
-  --danger: #EF4444;
-  --warning: #F59E0B;
-  --success: #10B981;
-  --muted: #71717A;
-  --foreground: #FAFAFA;
-}
-
-@layer base {
-  body {
-    @apply bg-[#09090B] text-[#FAFAFA] antialiased;
-    font-family: var(--font-sans);
-  }
-}
-
-@layer components {
-
-  /* Crisp Design Elements */
-  .card-base {
-    @apply bg-[var(--card)] border border-[var(--border)] rounded-lg overflow-hidden;
-  }
-
-  .btn-primary {
-    @apply bg-[var(--primary)] text-white px-4 py-2 rounded-md font-medium hover:brightness-110 transition-all active:scale-[0.98] disabled:opacity-50;
-  }
-
-  .btn-secondary {
-    @apply bg-transparent border border-[var(--border)] text-white px-4 py-2 rounded-md font-medium hover:bg-white/5 transition-all active:scale-[0.98];
-  }
-
-  /* Refined Status Pills */
-  .status-pill {
-    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border;
-  }
-
-  .status-pill-success {
-    @apply bg-[var(--success)]/10 border-[var(--success)]/20 text-[var(--success)];
-  }
-
-  .status-pill-warning {
-    @apply bg-[var(--warning)]/10 border-[var(--warning)]/20 text-[var(--warning)];
-  }
 
   .status-pill-danger {
     @apply bg-[var(--danger)]/10 border-[var(--danger)]/20 text-[var(--danger)];
