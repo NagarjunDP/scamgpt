@@ -1,4 +1,4 @@
-import google.generativeai as genai
+from google import genai
 import os
 import sys
 import json
@@ -14,10 +14,9 @@ class AIService:
     def __init__(self):
         api_key = os.getenv("GOOGLE_API_KEY")
         if api_key:
-            genai.configure(api_key=api_key)
-            self.model = genai.GenerativeModel('gemini-1.5-flash')
+            self.client = genai.Client(api_key=api_key)
         else:
-            self.model = None
+            self.client = None
             print("Warning: GOOGLE_API_KEY not found. AI reasoning will be disabled.")
 
     def _get_fallback_reasoning(self, input_text, results):
@@ -32,7 +31,7 @@ class AIService:
             return f"✅ LOW RISK: This {atype} appears to be safe. It does not match current known scam patterns and follows legitimate structural standards. \n\n### Recommendation\nYou can proceed, but always stay vigilant with digital interactions."
 
     def generate_explanation(self, input_data, detection_results, context=""):
-        if not self.model:
+        if not self.client:
             return "AI reasoning is currently unavailable due to missing API key."
 
         prompt = f"""
@@ -63,7 +62,10 @@ class AIService:
         """
         
         try:
-            response = self.model.generate_content(prompt)
+            response = self.client.models.generate_content(
+                model='gemini-1.5-flash',
+                contents=prompt
+            )
             return response.text
         except Exception as e:
             print(f"Gemini API Error: {e}")

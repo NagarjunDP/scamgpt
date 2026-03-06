@@ -6,7 +6,7 @@ numpy
 scipy
 joblib
 python-dotenv
-google-generativeai
+google-genai
 faiss-cpu
 sentence-transformers
 tldextract

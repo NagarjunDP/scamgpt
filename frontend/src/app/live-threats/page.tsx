@@ -9,9 +9,14 @@ import {
     ShieldAlert,
     ExternalLink,
     Zap,
-    Cpu,
-    Globe
+    Globe,
+    AlertCircle,
+    ArrowUpRight
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Card, CardContent } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 
 const INITIAL_THREATS = [
     { id: 1, type: 'Phishing', target: 'secure-amazon-refund.xyz', location: 'Mumbai, IN', time: 'Just now', severity: 'High' },
@@ -24,174 +29,146 @@ const INITIAL_THREATS = [
 const THREAT_TYPES = ['Phishing', 'UPI Fraud', 'SMS Scam', 'Brand Impersonation', 'Credential Theft'];
 const LOCATIONS = ['Mumbai, IN', 'Delhi, IN', 'Bangalore, IN', 'Chennai, IN', 'Kolkata, IN', 'Pune, IN', 'Ahmedabad, IN'];
 
+import axios from 'axios';
+
 export default function LiveThreatFeed() {
-    const [threats, setThreats] = useState(INITIAL_THREATS);
+    const [threats, setThreats] = useState<any[]>([]);
+    const [stats, setStats] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            const newThreat = {
-                id: Date.now(),
-                type: THREAT_TYPES[Math.floor(Math.random() * THREAT_TYPES.length)],
-                target: `threat-vector-${Math.floor(Math.random() * 999)}.net`,
-                location: LOCATIONS[Math.floor(Math.random() * LOCATIONS.length)],
-                time: 'Just now',
-                severity: Math.random() > 0.7 ? 'Critical' : (Math.random() > 0.4 ? 'High' : 'Medium')
-            };
+        const fetchData = async () => {
+            try {
+                const response = await axios.get('http://localhost:8000/dashboard');
+                setThreats(response.data.recent_threats || []);
+                setStats(response.data.stats || {});
+                setLoading(false);
+            } catch (error) {
+                console.error('Failed to fetch live threats:', error);
+            }
+        };
 
-            setThreats(prev => [newThreat, ...prev.slice(0, 14)]);
-        }, 4000);
-
+        fetchData();
+        const interval = setInterval(fetchData, 8000);
         return () => clearInterval(interval);
     }, []);
 
+    const activeNodes = stats ? (1242 + Object.values(stats as object).reduce((a: any, b: any) => a + (b as number), 0)) : 1242;
+
     return (
-        <div className="p-10 max-w-7xl mx-auto space-y-12 pb-32">
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border-b border-white/5 pb-12 relative"
-            >
-                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-
-                <div className="relative">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-4">
-                        <Activity className="w-3 h-3 animate-pulse" /> Live Monitoring Active
-                    </div>
-                    <h1 className="text-5xl font-display font-black text-white tracking-tighter leading-none mb-3">
-                        Global <span className="text-primary text-glow">Intelligence</span> Feed
-                    </h1>
-                    <p className="text-gray-500 font-bold uppercase text-[10px] tracking-[0.2em] max-w-xl">Real-time heuristic tracking of multi-vector cyber threats across global networks.</p>
+        <div className="p-8 md:p-10 space-y-10 animate-fade-in max-w-[1400px] mx-auto">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2 border-b border-zinc-800/50">
+                <div>
+                    <h1 className="text-2xl font-semibold text-white tracking-tight">Intelligence Stream</h1>
+                    <p className="text-zinc-500 text-xs mt-1.5 font-medium uppercase tracking-wider">Active Monitoring & Vector Analysis</p>
                 </div>
 
-                <div className="flex gap-4 relative">
-                    <div className="glass-card px-6 py-4 border-success/20 bg-success/[0.02] flex items-center gap-4">
-                        <div className="relative">
-                            <div className="status-dot bg-success" />
-                            <div className="absolute inset-0 bg-success blur-sm animate-pulse" />
-                        </div>
-                        <span className="text-xs font-black text-white uppercase">Nodes Synced</span>
-                    </div>
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900/50 border border-zinc-800 rounded-md">
+                    <span className="text-[10px] font-semibold text-zinc-400">Nodes Active:</span>
+                    <span className="text-[10px] font-bold text-white">{activeNodes.toLocaleString()}</span>
                 </div>
-            </motion.div>
+            </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                {/* Stats Sidebar */}
-                <div className="lg:col-span-3 space-y-8">
-                    <div className="glass-panel p-8 relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-                            <Zap className="w-20 h-20" />
-                        </div>
-                        <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-8">Activity Metrics</h3>
-                        <div className="space-y-8">
-                            <div>
-                                <p className="text-4xl font-display font-black text-white tracking-tighter mb-1">1,242</p>
-                                <p className="text-[9px] text-primary font-black uppercase tracking-widest">Threats Neutralized</p>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                {/* Side Stats */}
+                <div className="lg:col-span-3 space-y-6">
+                    <Card className="bg-zinc-900/20 border-zinc-800/60 shadow-none">
+                        <CardContent className="p-6">
+                            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-4">Inbound Volume</p>
+                            <div className="flex items-end gap-2 mb-2">
+                                <span className="text-4xl font-semibold text-white leading-none">{threats?.length || 0}</span>
+                                <span className="text-[11px] font-bold text-emerald-500 pb-1">+12%</span>
                             </div>
-                            <div>
-                                <p className="text-4xl font-display font-black text-white tracking-tighter mb-1">42</p>
-                                <p className="text-[9px] text-warning font-black uppercase tracking-widest">Active Operations</p>
-                            </div>
-                        </div>
-                        <div className="mt-10 pt-8 border-t border-white/5">
-                            <button className="w-full py-4 btn-cyber text-[10px] shadow-primary/10">Download Intelligence Report</button>
-                        </div>
-                    </div>
+                            <p className="text-[10px] text-zinc-600 font-medium uppercase tracking-widest">Active detections (2h)</p>
+                        </CardContent>
+                    </Card>
 
-                    <div className="glass-panel p-8 space-y-6">
-                        <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] flex items-center gap-2">
-                            <Globe className="w-4 h-4 text-primary" /> Region Status
-                        </h3>
-                        <div className="space-y-3">
-                            {[
-                                { label: 'Asia-South', status: 'Optimal', load: '12%' },
-                                { label: 'Europe-West', status: 'Peak Load', load: '84%', warning: true },
-                                { label: 'US-East', status: 'Optimal', load: '45%' },
-                            ].map((region, idx) => (
-                                <div key={idx} className="bg-white/[0.02] p-4 rounded-xl border border-white/5 group hover:border-white/10 transition-colors">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <span className="text-[10px] font-black text-white uppercase">{region.label}</span>
-                                        <span className={cn("text-[8px] font-black uppercase", region.warning ? "text-warning" : "text-success")}>{region.status}</span>
+                    <Card className="bg-zinc-900/20 border-zinc-800/60 shadow-none">
+                        <CardContent className="p-6">
+                            <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+                                <Globe className="w-3.5 h-3.5" /> Regional Status
+                            </h3>
+                            <div className="space-y-5">
+                                {['Asia-South', 'EU-West', 'US-East'].map((region, idx) => (
+                                    <div key={idx} className="space-y-1.5">
+                                        <div className="flex justify-between items-center text-[11px]">
+                                            <span className="font-medium text-zinc-400">{region}</span>
+                                            <span className="font-semibold text-emerald-500">Live</span>
+                                        </div>
+                                        <div className="h-1 w-full bg-zinc-800 rounded-full overflow-hidden">
+                                            <div className="h-full bg-blue-500/30" style={{ width: idx === 0 ? '85%' : '45%' }} />
+                                        </div>
                                     </div>
-                                    <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
-                                        <div className={cn("h-full", region.warning ? "bg-warning" : "bg-success")} style={{ width: region.load }} />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
 
                 {/* Live List */}
-                <div className="lg:col-span-9 space-y-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-[11px] font-black text-gray-500 uppercase tracking-[0.4em]">Inbound Threat Vectors</h2>
-                        <div className="text-[9px] font-black text-primary/50 uppercase tracking-widest animate-pulse">Scanning Global Ports...</div>
+                <div className="lg:col-span-9">
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Neural Vector Activity</h2>
+                        <div className="flex items-center gap-2 text-[10px] font-semibold text-blue-400 bg-blue-500/5 px-2 py-1 rounded">
+                            <div className="w-1 h-1 bg-blue-400 rounded-full animate-pulse" /> Stream Synced
+                        </div>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-1">
                         <AnimatePresence mode="popLayout">
                             {threats.map((threat) => (
                                 <motion.div
                                     key={threat.id}
                                     layout
-                                    initial={{ opacity: 0, x: -20, scale: 0.98 }}
-                                    animate={{ opacity: 1, x: 0, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.95 }}
-                                    className="glass-panel p-6 hover:border-primary/30 transition-all duration-300 flex flex-col md:flex-row items-center gap-8 relative group overflow-hidden"
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.99 }}
                                 >
-                                    <div className="absolute top-0 left-0 w-1 h-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                                    <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-lg",
-                                        threat.severity === 'Critical' ? 'bg-danger/20 text-danger shadow-danger/10' :
-                                            threat.severity === 'High' ? 'bg-warning/20 text-warning shadow-warning/10' : 'bg-primary/20 text-primary shadow-primary/10'
-                                    )}>
-                                        <ShieldAlert className="w-7 h-7" />
-                                    </div>
-
-                                    <div className="flex-1 text-center md:text-left space-y-1">
-                                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-                                            <span className={cn("text-[10px] font-black uppercase tracking-[0.2em]",
-                                                threat.severity === 'Critical' ? 'text-danger' :
-                                                    threat.severity === 'High' ? 'text-warning' : 'text-primary'
-                                            )}>{threat.type}</span>
-                                            <span className="text-[10px] text-white/20 hidden md:block">|</span>
-                                            <span className="text-[10px] text-gray-600 font-black uppercase tracking-widest flex items-center gap-1.5">
-                                                <Clock className="w-3.5 h-3.5" />
-                                                {threat.time}
-                                            </span>
-                                        </div>
-                                        <p className="text-xl font-display font-bold text-white group-hover:text-primary transition-colors tracking-tight">{threat.target}</p>
-                                    </div>
-
-                                    <div className="flex flex-col md:items-end gap-2 shrink-0 md:text-right">
-                                        <div className="flex items-center gap-2 text-gray-500 font-bold uppercase text-[9px] tracking-widest">
-                                            <MapPin className="w-3.5 h-3.5" />
-                                            {threat.location}
-                                        </div>
-                                        <div className={cn("px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg",
-                                            threat.severity === 'Critical' ? 'bg-danger text-white shadow-danger/20' :
-                                                threat.severity === 'High' ? 'bg-warning text-black shadow-warning/20' : 'bg-primary text-white shadow-primary/20'
+                                    <div className="group flex items-center gap-6 p-4 bg-zinc-900/10 border border-zinc-800/40 rounded-lg hover:border-zinc-700 hover:bg-zinc-800/20 transition-standard cursor-default">
+                                        <div className={cn("w-10 h-10 rounded-md flex items-center justify-center shrink-0 border border-zinc-800/60",
+                                            threat.risk_score > 0.8 ? 'bg-rose-500/5 text-rose-500 border-rose-500/10' :
+                                                threat.risk_score > 0.5 ? 'bg-amber-500/5 text-amber-500 border-amber-500/10' :
+                                                    'bg-blue-500/5 text-blue-500 border-blue-500/10'
                                         )}>
-                                            {threat.severity} Priority
+                                            <AlertCircle className="w-5 h-5" />
+                                        </div>
+
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-3 mb-1">
+                                                <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">{threat.type}</span>
+                                                <span className="text-[10px] text-zinc-700 font-medium flex items-center gap-1.5">
+                                                    <Clock className="w-3 h-3" /> {new Date(threat.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </span>
+                                            </div>
+                                            <p className="text-sm font-semibold text-white truncate group-hover:text-blue-400 transition-colors uppercase tracking-tight">{threat.target}</p>
+                                        </div>
+
+                                        <div className="hidden md:flex flex-col items-end gap-1.5 shrink-0 px-6 border-l border-zinc-800/50">
+                                            <div className="flex items-center gap-1.5 text-zinc-500 font-semibold text-[10px] uppercase tracking-widest">
+                                                <MapPin className="w-3 h-3" /> {threat.location}
+                                            </div>
+                                            <Badge variant={threat.risk_score > 0.8 ? 'danger' : threat.risk_score > 0.5 ? 'warning' : 'neutral'} className="text-[9px] py-0 px-1.5">
+                                                {(threat.risk_score * 100).toFixed(0)}% Match
+                                            </Badge>
+                                        </div>
+
+                                        <div className="h-9 w-9 rounded-md bg-zinc-800/50 border border-zinc-700/50 text-zinc-500 hover:text-white hover:bg-zinc-700/50 transition-standard flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                            <ArrowUpRight className="w-4 h-4" />
                                         </div>
                                     </div>
-
-                                    <button className="p-3 rounded-2xl bg-white/[0.03] border border-white/5 text-gray-600 hover:text-white hover:border-primary/40 transition-all">
-                                        <ExternalLink className="w-5 h-5" />
-                                    </button>
                                 </motion.div>
                             ))}
+                            {threats.length === 0 && !loading && (
+                                <div className="py-24 text-center space-y-4">
+                                    <Activity className="w-10 h-10 text-zinc-800 mx-auto" />
+                                    <p className="text-zinc-600 font-semibold text-[10px] uppercase tracking-widest">Waiting for inbound data...</p>
+                                </div>
+                            )}
                         </AnimatePresence>
                     </div>
                 </div>
             </div>
         </div>
     );
-}
-
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs));
 }

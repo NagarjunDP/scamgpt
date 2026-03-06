@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import Sidebar from "@/components/Sidebar";
+import Sidebar from "@/components/layout/Sidebar";
+import Header from "@/components/layout/Header";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ScamGPT | Cyber Intelligence Platform",
-  description: "Cognitive AI security platform for real-time scam detection and analysis.",
+  title: "ScamGPT | Cybersecurity AI Platform",
+  description: "Enterprise-grade cognitive AI security platform for real-time scam detection.",
 };
 
 export default function RootLayout({
@@ -13,23 +14,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className="antialiased flex min-h-screen bg-[#060910] overflow-hidden font-sans selection:bg-primary/30 selection:text-white">
-        {/* Cybersecurity Overlays */}
-        <div className="scanline" />
-        <div className="fixed inset-0 pointer-events-none radar-grid z-0 opacity-20" />
-
+    <html lang="en" className="dark scroll-smooth">
+      <body className="antialiased flex h-screen bg-[#0B0F19] overflow-hidden">
+        {/* Strict SaaS Layout Shell */}
         <Sidebar />
 
-        <main className="flex-1 min-w-0 relative h-screen overflow-y-auto custom-scrollbar z-10">
-          <div className="relative w-full min-h-full">
-            {children}
-          </div>
-        </main>
-
-        {/* Decorative Data Flows */}
-        <div className="data-flow left-[10%] opacity-10" style={{ animationDelay: '0s' }} />
-        <div className="data-flow left-[85%] opacity-10" style={{ animationDelay: '1.5s' }} />
+        <div className="flex-1 flex flex-col min-w-0">
+          <Header />
+          <main className="flex-1 overflow-y-auto scrollbar-thin bg-neural-grid">
+            <div className="w-full h-full max-w-[1600px] mx-auto">
+              {children}
+            </div>
+          </main>
+        </div>
       </body>
     </html>
   );

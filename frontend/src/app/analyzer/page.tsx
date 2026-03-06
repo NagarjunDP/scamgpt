@@ -1,139 +1,154 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Search, Terminal, Cpu, ArrowRight, ShieldCheck, Globe, MessageSquare, Database, ShieldAlert } from "lucide-react";
+import {
+    Search,
+    Terminal,
+    Cpu,
+    ArrowRight,
+    ShieldCheck,
+    Globe,
+    MessageSquare,
+    Database,
+    ShieldAlert,
+    Zap,
+    Network,
+    Fingerprint
+} from "lucide-react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils";
+import { Card, CardContent } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 
-const AnalyzerCard = ({ icon: Icon, title, description, badge, color, delay, href }: any) => (
+const AnalyzerCard = ({ icon: Icon, title, description, badge, href, delay }: any) => (
     <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay }}
-        className="glass-card group hover:border-primary/30 transition-all duration-500 overflow-hidden relative border-white/5"
     >
-        <div className={cn("absolute top-0 right-0 w-32 h-32 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/10 transition-colors bg-white/5")} />
-        <div className="p-8 h-full flex flex-col relative z-10">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 bg-white/5 border border-white/10 group-hover:border-primary/20 group-hover:bg-primary/5 transition-all">
-                <Icon className="w-7 h-7 text-gray-400 group-hover:text-primary transition-colors" />
-            </div>
-            <div className="flex items-center gap-3 mb-4">
-                <h3 className="text-xl font-display font-bold text-white">{title}</h3>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded border border-white/10 bg-white/5 text-gray-500 uppercase tracking-widest group-hover:text-primary group-hover:border-primary/20 transition-all">
-                    {badge}
-                </span>
-            </div>
-            <p className="text-gray-400 text-sm leading-relaxed mb-8 flex-1">
-                {description}
-            </p>
-            <Link
-                href={href}
-                className="flex items-center gap-2 text-xs font-bold text-gray-500 group-hover:text-white transition-colors"
-            >
-                Start Analysis
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-        </div>
+        <Card className="h-full border-zinc-800/60 bg-zinc-900/10 hover:border-zinc-700/80 transition-standard group">
+            <CardContent className="p-7 flex flex-col h-full">
+                <div className="w-11 h-11 rounded-lg bg-zinc-800/50 border border-zinc-700/30 flex items-center justify-center mb-6 transition-standard group-hover:border-zinc-600">
+                    <Icon className="w-5 h-5 text-zinc-400 group-hover:text-white transition-colors" />
+                </div>
+                <div className="flex items-center gap-3 mb-3">
+                    <h3 className="text-lg font-semibold text-white tracking-tight">{title}</h3>
+                    <Badge variant="neutral" className="text-[9px] bg-zinc-800/50 border-zinc-700/50">{badge}</Badge>
+                </div>
+                <p className="text-zinc-500 text-xs leading-relaxed mb-8 flex-1">
+                    {description}
+                </p>
+                <div className="pt-4 border-t border-zinc-800/50">
+                    <Link
+                        href={href}
+                        className="flex items-center gap-2 text-[11px] font-semibold text-zinc-500 hover:text-white transition-colors"
+                    >
+                        Initialize Intelligence
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                    </Link>
+                </div>
+            </CardContent>
+        </Card>
     </motion.div>
 );
 
 export default function AnalyzerPage() {
     return (
-        <div className="flex-1 overflow-y-auto p-8 lg:p-12 bg-[#0B0F19]">
-            <div className="max-w-6xl mx-auto">
-                <div className="mb-16">
-                    <h1 className="text-3xl font-display font-bold text-white tracking-tight">Specialized Cognitive Analysis Cluster</h1>
-                    <p className="text-gray-500 mt-2 max-w-2xl leading-relaxed">
-                        Access our distributed neural nodes trained specifically for various threat vectors.
-                        Each analyzer utilizes specialized heuristics and cognitive reasoning.
-                    </p>
-                </div>
+        <div className="p-8 lg:p-12 animate-fade-in max-w-[1200px] mx-auto">
+            <div className="mb-16">
+                <Badge variant="neutral" className="mb-4 bg-zinc-800/50">System Distribution</Badge>
+                <h1 className="text-3xl font-semibold text-white tracking-tight">Intelligence Nodes</h1>
+                <p className="text-zinc-500 mt-3 max-w-2xl text-base leading-relaxed font-medium">
+                    Access specialized clusters optimized for regional and sector-specific threat signatures.
+                </p>
+            </div>
 
-                <div className="analyzer-grid mb-20">
-                    <AnalyzerCard
-                        icon={Globe}
-                        title="URL Phishing Node"
-                        badge="Real-time"
-                        description="Analyzes domain reputation, homograph threats, and redirection loops using cognitive linguistic patterns."
-                        delay={0.1}
-                        href="/chat?tab=url"
-                    />
-                    <AnalyzerCard
-                        icon={MessageSquare}
-                        title="NLP Logic Engine"
-                        badge="Advanced"
-                        description="Evaluates scam psychology, urgency lures, and institutional impersonation in SMS and emails."
-                        delay={0.2}
-                        href="/chat?tab=message"
-                    />
-                    <AnalyzerCard
-                        icon={Cpu}
-                        title="Behavioral Fraud"
-                        badge="Sandbox"
-                        description="Identifies transaction anomalies, payment context risks, and behavioral indicators of financial scams."
-                        delay={0.3}
-                        href="/chat?tab=transaction"
-                    />
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+                <AnalyzerCard
+                    icon={Globe}
+                    title="URL Intelligence"
+                    badge="Active"
+                    description="Real-time analysis of domain reputation and homograph linguistic patterns."
+                    href="/?tab=url"
+                    delay={0.1}
+                />
+                <AnalyzerCard
+                    icon={MessageSquare}
+                    title="Linguistic Logic"
+                    badge="Cognitive"
+                    description="Evaluation of scam psychology and urgency cues in communication streams."
+                    href="/?tab=message"
+                    delay={0.2}
+                />
+                <AnalyzerCard
+                    icon={Cpu}
+                    title="Behavioral Fraud"
+                    badge="Sandbox"
+                    description="Detection of transaction anomalies and behavioral risk indicators."
+                    href="/?tab=transaction"
+                    delay={0.3}
+                />
+            </div>
 
-                {/* Technical Overview Section */}
-                <div className="glass-card p-10 relative overflow-hidden border-white/5 bg-black/20">
-                    <div className="absolute top-0 right-0 w-[500px] h-[300px] bg-primary/5 blur-[100px] rounded-full" />
-                    <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                        <div className="space-y-8">
+            {/* Technical Context Section */}
+            <Card className="border-zinc-800/60 bg-zinc-900/10">
+                <CardContent className="p-10">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                        <div className="space-y-10">
                             <div>
-                                <h2 className="text-2xl font-display font-bold text-white mb-2">Analysis Methodology</h2>
-                                <p className="text-gray-500 text-sm leading-relaxed">Our protocol ensures a 99.4% detection rate through a multi-layer verification stack.</p>
+                                <h2 className="text-xl font-semibold text-white mb-2 tracking-tight">Operational Protocol</h2>
+                                <p className="text-zinc-500 text-xs leading-relaxed font-medium">Multi-layer verification stack ensuring deterministic accuracy across all nodes.</p>
                             </div>
 
-                            <div className="grid grid-cols-1 gap-6">
+                            <div className="space-y-6">
                                 {[
-                                    { icon: Database, title: "Pattern Memory", desc: "Cross-referencing 10k+ historical scam campaigns." },
-                                    { icon: ShieldAlert, title: "Heuristic Defense", desc: "Evaluating 54+ known red-flag cyberattack signatures." },
-                                    { icon: Terminal, title: "Cognitive AI", desc: "LLM-driven analysis of attack psychology and reasoning." }
+                                    { icon: Database, title: "Pattern Memory", desc: "Cross-referencing 10k+ validated scam signatures." },
+                                    { icon: ShieldAlert, title: "Heuristic Core", desc: "Real-time evaluation of 54+ red-flag vectors." },
+                                    { icon: Fingerprint, title: "Identity Validation", desc: "Deep analysis of impersonation and authority lures." }
                                 ].map((step, i) => (
                                     <div key={i} className="flex gap-4">
-                                        <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
-                                            <step.icon size={18} className="text-primary" />
+                                        <div className="w-9 h-9 rounded-md bg-zinc-800/50 border border-zinc-700/30 flex items-center justify-center shrink-0">
+                                            <step.icon size={16} className="text-zinc-400" />
                                         </div>
                                         <div>
-                                            <h4 className="text-sm font-bold text-white tracking-tight">{step.title}</h4>
-                                            <p className="text-gray-500 text-[11px] leading-relaxed">{step.desc}</p>
+                                            <h4 className="text-sm font-semibold text-zinc-200">{step.title}</h4>
+                                            <p className="text-zinc-500 text-[11px] leading-relaxed mt-0.5">{step.desc}</p>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         </div>
 
-                        <div className="p-8 bg-black/40 rounded-3xl border border-white/5 space-y-4">
-                            <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                                <span className="text-[10px] font-bold text-emerald-500 tracking-widest uppercase">System Validation Status</span>
+                        <div className="p-8 bg-black/20 rounded-xl border border-zinc-800/50 space-y-6">
+                            <div className="flex items-center justify-between border-b border-zinc-800/80 pb-4">
+                                <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Protocol Active</span>
                                 <ShieldCheck className="w-4 h-4 text-emerald-500" />
                             </div>
                             <div className="space-y-4 font-mono text-[10px]">
                                 {[
-                                    { k: "ML_CONFIDENCE", v: "0.9842" },
-                                    { k: "LINGUISTIC_TRAP", v: "DETECTED" },
-                                    { k: "MEMORY_MATCH", v: "PHISHING_V4" },
-                                    { k: "RESPONSE_TIME", v: "420ms" }
+                                    { k: "ML_ENGINE", v: "0.9942" },
+                                    { k: "THREAT_LAYER", v: "L4_DETECT" },
+                                    { k: "LATENCY", v: "42ms" },
+                                    { k: "NODES", v: "1,242" }
                                 ].map(item => (
                                     <div key={item.k} className="flex justify-between">
-                                        <span className="text-gray-600 uppercase">{item.k}:</span>
-                                        <span className="text-white font-bold tracking-widest">{item.v}</span>
+                                        <span className="text-zinc-700 font-medium">{item.k}</span>
+                                        <span className="text-zinc-300 font-bold">{item.v}</span>
                                     </div>
                                 ))}
-                                <div className="h-1.5 w-full bg-white/5 rounded-full mt-4 overflow-hidden">
+                                <div className="h-1 w-full bg-zinc-800 rounded-full mt-6 overflow-hidden">
                                     <motion.div
                                         initial={{ width: 0 }}
-                                        animate={{ width: "95%" }}
-                                        className="h-full bg-primary shadow-lg shadow-primary/20"
+                                        animate={{ width: "94%" }}
+                                        className="h-full bg-blue-500/40"
                                     />
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                </CardContent>
+            </Card>
         </div>
     );
 }

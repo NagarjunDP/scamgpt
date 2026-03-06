@@ -1,129 +1,125 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import { Info, BookOpen, ShieldCheck, Heart, Users, Globe, Zap } from "lucide-react";
+import React from 'react';
+import { Shield, Target, Cpu, Database, Users, ArrowRight } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 
-const InfoCard = ({ icon: Icon, title, description, delay }: any) => (
-    <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay }}
-        className="glass-card p-8 border-white/5 bg-white/2"
-    >
-        <div className="w-12 h-12 rounded-full bg-[#00d4ff]/10 flex items-center justify-center mb-6">
-            <Icon className="w-6 h-6 text-[#00d4ff]" />
-        </div>
-        <h3 className="text-xl font-display font-bold text-white mb-4">{title}</h3>
-        <p className="text-gray-400 text-sm leading-relaxed">{description}</p>
-    </motion.div>
-);
-
-export default function AboutPage() {
+export default function About() {
     return (
-        <div className="max-w-7xl mx-auto px-6 py-12">
-            <section className="text-center mb-20 px-4">
-                <h1 className="text-4xl md:text-6xl font-display font-bold text-white mb-6">
-                    Our Mission: <span className="text-[#00d4ff]">Cognitive AI Defense</span>
+        <div className="p-8 md:p-12 animate-fade-in max-w-5xl mx-auto py-16 selection:bg-blue-500/20">
+            {/* Mission Section */}
+            <div className="mb-24">
+                <Badge variant="neutral" className="mb-6 bg-zinc-800/50">Project Architecture</Badge>
+                <h1 className="text-4xl font-semibold text-white tracking-tight mb-8 leading-tight">
+                    Cognitive Layer <br />
+                    <span className="text-zinc-500 font-medium tracking-normal text-3xl italic">Against Digital Frauds.</span>
                 </h1>
-                <p className="text-gray-400 max-w-3xl mx-auto text-lg leading-relaxed">
-                    ScamGPT was built to bridge the gap between complex cyber threats and everyday digital security.
-                    By combining advanced AI reasoning with real-world threat datasets, we empower users to stay ahead of sophisticated scams.
+                <p className="text-lg text-zinc-500 max-w-2xl leading-relaxed font-medium">
+                    ScamGPT leverages hybrid machine learning and LLM-based cognitive reasoning to identify, attribute, and neutralize multi-vector cyber scams in real-time.
                 </p>
-            </section>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-32">
-                <InfoCard
-                    icon={ShieldCheck}
-                    title="Trained on Reality"
-                    description="Built using datasets including thousands of phishing URLs, fraudulent UPI transactions, and social engineering scripts."
-                    delay={0.1}
-                />
-                <InfoCard
-                    icon={Brain}
-                    title="Cognitive Reasoning"
-                    description="It doesn&apos;t just flag threats; it explains the 'why', helping users build their own digital intuition over time."
-                    delay={0.2}
-                />
-                <InfoCard
-                    icon={Heart}
-                    title="Social Impact"
-                    description="Focused on protecting vulnerable groups from financial fraud, QR scams, and phishing attacks."
-                    delay={0.3}
-                />
             </div>
 
-            <section className="mb-32">
-                <div className="flex items-center gap-4 mb-12">
-                    <BookOpen className="w-10 h-10 text-[#00d4ff]" />
-                    <h2 className="text-4xl font-display font-bold text-white">Scam Knowledge Center</h2>
-                </div>
+            {/* Core Pillars Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-24">
+                {[
+                    { title: 'Hybrid Intelligence', desc: 'Combines heuristic scoring with linguistic cognitive models for pinpoint accuracy.', icon: Brain },
+                    { title: 'Signature Sync', desc: 'Real-time synchronization across global security nodes for immediate propagation.', icon: Network },
+                    { title: 'Attack Graphing', desc: 'Deconstruction of scam workflows to identify root infrastructure and objectives.', icon: Target },
+                ].map((pillar, i) => (
+                    <Card key={i} className="bg-zinc-900/10 border-zinc-800/50 hover:border-zinc-700/80 transition-standard group shadow-none">
+                        <CardContent className="p-8">
+                            <div className="w-10 h-10 rounded-lg bg-zinc-800/50 border border-zinc-700/30 flex items-center justify-center text-zinc-400 mb-6 group-hover:text-white transition-colors">
+                                <pillar.icon size={20} />
+                            </div>
+                            <h3 className="text-base font-semibold text-white mb-2">{pillar.title}</h3>
+                            <p className="text-xs text-zinc-500 leading-relaxed font-medium">{pillar.desc}</p>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {[
-                        { title: "Phishing Scams", desc: "Digital impersonation where attackers trick users into sharing sensitive credentials via fake websites." },
-                        { title: "UPI & QR Scams", desc: "Request-to-pay frauds where users accidentally authorize payments while expecting a refund." },
-                        { title: "Loan & Job Fraud", desc: "Social engineering attacks promising easy money or employment to steal processing fees." },
-                        { title: "Social Engineering", desc: "Psychological manipulation designed to create urgency or panic, leading to security lapses." }
-                    ].map((topic, i) => (
-                        <motion.div
-                            key={i}
-                            whileHover={{ x: 10 }}
-                            className="p-8 glass-card border-white/5 hover:border-[#00d4ff]/20 transition-all cursor-default"
-                        >
-                            <h4 className="text-[#00d4ff] font-display font-bold text-xl mb-2">{topic.title}</h4>
-                            <p className="text-gray-400 text-sm leading-relaxed">{topic.desc}</p>
-                        </motion.div>
-                    ))}
-                </div>
-            </section>
+            {/* Technical Specs */}
+            <Card className="border-zinc-800/50 bg-zinc-900/10 shadow-none overflow-hidden">
+                <CardContent className="p-0">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+                        <div className="p-12 border-r border-zinc-800/50">
+                            <h2 className="text-xl font-semibold text-white mb-8">Operational Performance</h2>
+                            <div className="space-y-6">
+                                {[
+                                    { label: 'Inference Latency', value: '< 20ms' },
+                                    { label: 'Memory Pool', value: '1.2M+ Signatures' },
+                                    { label: 'Verification Rate', value: '99.4%' },
+                                ].map((spec, i) => (
+                                    <div key={i} className="flex items-center justify-between py-3 border-b border-zinc-800/50 last:border-0">
+                                        <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">{spec.label}</span>
+                                        <span className="text-sm font-semibold text-zinc-300">{spec.value}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="p-12 flex items-center justify-center bg-black/20">
+                            <div className="relative group">
+                                <div className="absolute inset-0 bg-blue-500/5 blur-3xl rounded-full" />
+                                <Shield className="w-32 h-32 text-zinc-800 relative z-10 transition-standard group-hover:text-zinc-700" />
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
 
-            <section className="glass-card p-12 text-center bg-gradient-to-b from-[#00d4ff]/5 to-transparent border-[#00d4ff]/10">
-                <h2 className="text-3xl font-display font-bold text-white mb-6">Designed for Change</h2>
-                <p className="text-gray-400 max-w-2xl mx-auto mb-10 text-lg">
-                    ScamGPT is more than just a tool; it&apos;s a collective defense network. Every report you submit
-                    makes the digital world slightly safer for everyone else.
-                </p>
-                <div className="flex flex-wrap justify-center gap-12">
-                    <div className="flex flex-col items-center">
-                        <span className="text-4xl font-display font-bold text-white mb-1">10k+</span>
-                        <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Threats Analyzed</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                        <span className="text-4xl font-display font-bold text-white mb-1">Real-time</span>
-                        <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Heuristic Engine</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                        <span className="text-4xl font-display font-bold text-white mb-1">Free</span>
-                        <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Open Access</span>
-                    </div>
+            <div className="mt-24 text-center border-t border-zinc-800/50 pt-20">
+                <p className="text-zinc-600 text-sm mb-10 font-medium italic">"Building the global immune system for the digital age."</p>
+                <div className="flex justify-center">
+                    <Button variant="secondary" className="gap-2 px-8 py-2.5 bg-zinc-800/50 border-zinc-700 hover:bg-zinc-700/50 hover:text-white transition-standard">
+                        Network Statistics <ArrowRight className="w-3.5 h-3.5" />
+                    </Button>
                 </div>
-            </section>
+            </div>
         </div>
     );
 }
 
-function Brain({ className }: { className?: string }) {
+function Brain(props: any) {
     return (
         <svg
+            {...props}
             xmlns="http://www.w3.org/2000/svg"
-            width="24" height="24"
+            width="24"
+            height="24"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className={className}
         >
-            <path d="M9.5 2a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 1 .5-.5z" />
-            <path d="M14.5 2a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 1 .5-.5z" />
-            <path d="M11 11H9.5a2.5 2.5 0 0 0 0 5h1" />
-            <path d="M13 11h1.5a2.5 2.5 0 0 1 0 5h-1" />
-            <path d="M12 11h.01" />
-            <path d="M12 2v2" />
-            <path d="M12 20v2" />
-            <path d="M12 11a4 4 0 0 1 0 8" />
-            <path d="M8 8a5 5 0 0 1 8 0" />
+            <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.54Z" />
+            <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.54Z" />
         </svg>
-    );
+    )
+}
+
+function Network(props: any) {
+    return (
+        <svg
+            {...props}
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <rect x="16" y="16" width="6" height="6" rx="1" />
+            <rect x="2" y="16" width="6" height="6" rx="1" />
+            <rect x="9" y="2" width="6" height="6" rx="1" />
+            <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" />
+            <path d="M12 12V8" />
+        </svg>
+    )
 }

@@ -6,21 +6,20 @@ import {
     ShieldAlert,
     ShieldCheck,
     ShieldQuestion,
-    AlertTriangle,
-    ArrowRight,
     Target,
-    FileSearch,
     Zap,
-    ChevronRight,
-    Database,
-    Activity
+    ArrowRight,
+    Eye,
+    Activity,
+    Lock,
+    AlertCircle,
+    Flag,
+    Terminal
 } from 'lucide-react';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs));
-}
+import { cn } from '@/lib/utils';
+import { Card, CardHeader, CardContent } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 
 interface ThreatReportProps {
     data: {
@@ -43,166 +42,129 @@ export default function ThreatReport({ data, onReset }: ThreatReportProps) {
     const isHighRisk = data.risk_score > 0.6;
     const isMediumRisk = data.risk_score > 0.3 && data.risk_score <= 0.6;
 
-    const riskColor = isHighRisk ? 'text-danger' : isMediumRisk ? 'text-warning' : 'text-success';
-    const riskBg = isHighRisk ? 'bg-danger/10 border-danger/20' : isMediumRisk ? 'bg-warning/10 border-warning/20' : 'bg-success/10 border-success/20';
-    const riskGlow = isHighRisk ? 'shadow-danger/20' : isMediumRisk ? 'shadow-warning/20' : 'shadow-success/20';
+    const riskColor = isHighRisk ? 'text-rose-500' : isMediumRisk ? 'text-amber-500' : 'text-emerald-500';
+    const riskVariant = isHighRisk ? 'danger' : isMediumRisk ? 'warning' : 'success';
 
     return (
-        <div className="w-full max-w-6xl mx-auto space-y-8 pb-32">
-            {/* Top Analysis Banner */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={cn("p-8 rounded-[2rem] border relative overflow-hidden flex flex-col md:flex-row items-center gap-8 shadow-2xl", riskBg, riskGlow)}
-            >
-                <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-                    <ShieldAlert className="w-40 h-40" />
-                </div>
-
-                <div className={cn("w-24 h-24 rounded-3xl flex items-center justify-center shadow-2xl shrink-0", isHighRisk ? "bg-danger shadow-danger/40" : isMediumRisk ? "bg-warning shadow-warning/40" : "bg-success shadow-success/40")}>
-                    {isHighRisk ? <ShieldAlert className="w-12 h-12 text-white" /> : isMediumRisk ? <ShieldQuestion className="w-12 h-12 text-white" /> : <ShieldCheck className="w-12 h-12 text-white" />}
-                </div>
-
-                <div className="flex-1 text-center md:text-left">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 text-[10px] font-black text-white uppercase tracking-[0.2em] mb-4">
-                        <Activity className="w-3 h-3" /> Report ID: {Math.random().toString(36).substr(2, 9).toUpperCase()}
+        <div className="space-y-10 animate-fade-in py-10 max-w-6xl mx-auto">
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-zinc-800/50">
+                <div>
+                    <div className="flex items-center gap-2 text-zinc-500 text-[10px] font-bold uppercase tracking-widest mb-3">
+                        <Activity className="w-3 h-3 text-blue-500" /> Audit #SR-{Math.random().toString(36).substr(2, 6).toUpperCase()}
                     </div>
-                    <h2 className="text-4xl font-display font-black text-white mb-2 tracking-tight">
-                        {isHighRisk ? 'CRITICAL THREAT DETECTED' : isMediumRisk ? 'SUSPICIOUS SIGNAL IDENTIFIED' : 'SCAN VERIFIED: CLEAN'}
-                    </h2>
-                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
-                        <div className="flex items-center gap-2">
-                            <div className={cn("status-dot", isHighRisk ? "bg-danger" : isMediumRisk ? "bg-warning" : "bg-success")} />
-                            <span className={cn("text-xs font-black uppercase tracking-widest", riskColor)}>{data.threat_level} Priority Analysis</span>
-                        </div>
-                        <span className="text-white/20 hidden md:block">|</span>
-                        <div className="flex items-center gap-2 text-white/60 text-xs font-bold uppercase tracking-widest">
-                            <Target className="w-4 h-4" /> Vector: {data.attack_type}
-                        </div>
-                    </div>
+                    <h2 className="text-3xl font-semibold text-white tracking-tight">Security Intelligence</h2>
                 </div>
+                <Button variant="secondary" onClick={onReset} className="gap-2 h-10 px-5 text-xs bg-zinc-800/50 border-zinc-700 hover:bg-zinc-700/50 transition-standard">
+                    New Scan <ArrowRight className="w-3.5 h-3.5" />
+                </Button>
+            </div>
 
-                <button
-                    onClick={onReset}
-                    className="btn-cyber px-8 py-4 bg-white/5 border border-white/10 hover:bg-white/10 text-white shadow-none shrink-0"
-                >
-                    Initialize New Scan
-                </button>
-            </motion.div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                {/* Left Column: Metrics */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                {/* Score Column */}
                 <div className="lg:col-span-4 space-y-8">
-                    {/* High Fidelity Risk Meter */}
-                    <div className="glass-panel p-8 flex flex-col items-center">
-                        <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-8">Risk Probability</h3>
-                        <div className="relative w-48 h-48 flex items-center justify-center">
-                            <svg className="w-full h-full -rotate-90">
-                                <circle cx="96" cy="96" r="88" fill="transparent" stroke="rgba(255,255,255,0.03)" strokeWidth="12" />
-                                <motion.circle
-                                    cx="96" cy="96" r="88" fill="transparent" stroke="currentColor" strokeWidth="12"
-                                    strokeDasharray={552.9}
-                                    initial={{ strokeDashoffset: 552.9 }}
-                                    animate={{ strokeDashoffset: 552.9 - (552.9 * data.risk_score) }}
-                                    transition={{ duration: 2, ease: "easeOut" }}
-                                    className={riskColor}
-                                />
-                            </svg>
-                            <div className="absolute flex flex-col items-center justify-center text-center">
-                                <span className="text-5xl font-display font-black text-white tracking-tighter">{Math.round(data.risk_score * 100)}%</span>
-                                <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest mt-1">Threat Score</span>
+                    <Card className="bg-zinc-900/10 border-zinc-800/60 shadow-none overflow-hidden group">
+                        <CardContent className="p-10 text-center">
+                            <div className={cn("w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-8 border transition-standard",
+                                isHighRisk ? "bg-rose-500/5 border-rose-500/20 text-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.1)]" :
+                                    isMediumRisk ? "bg-amber-500/5 border-amber-500/20 text-amber-500" :
+                                        "bg-emerald-500/5 border-emerald-500/20 text-emerald-500"
+                            )}>
+                                {isHighRisk ? <ShieldAlert className="w-10 h-10" /> : isMediumRisk ? <ShieldQuestion className="w-10 h-10" /> : <ShieldCheck className="w-10 h-10" />}
                             </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4 w-full mt-10">
-                            <div className="bg-white/[0.02] p-4 rounded-2xl border border-white/5 text-center">
-                                <span className="block text-[8px] font-black text-gray-600 uppercase tracking-widest mb-1">Status</span>
-                                <span className={cn("text-xs font-black uppercase", riskColor)}>{isHighRisk ? 'Lethal' : 'Stable'}</span>
-                            </div>
-                            <div className="bg-white/[0.02] p-4 rounded-2xl border border-white/5 text-center">
-                                <span className="block text-[8px] font-black text-gray-600 uppercase tracking-widest mb-1">Confidence</span>
-                                <span className="text-xs font-black text-white uppercase">98.4%</span>
-                            </div>
-                        </div>
-                    </div>
+                            <h3 className="text-6xl font-semibold text-white mb-2 tabular-nums">{(data.risk_score * 100).toFixed(0)}%</h3>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-600 mb-8">Aggregate Risk Index</p>
+                            <Badge variant={riskVariant as any} className="w-full justify-center py-2 text-[10px] h-auto uppercase tracking-wider font-bold">
+                                {data.threat_level} Severity Vector
+                            </Badge>
+                        </CardContent>
+                    </Card>
 
-                    {/* Source Intelligence */}
-                    <div className="glass-panel p-8 space-y-6">
-                        <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] flex items-center gap-2">
-                            <Database className="w-4 h-4 text-primary" /> Intelligence Match
-                        </h3>
-                        <div className="space-y-4">
-                            <div className="flex justify-between items-end">
-                                <p className="text-lg font-display font-bold text-white uppercase leading-tight">{data.pattern_memory.status}</p>
-                                <p className="text-2xl font-display font-bold text-primary">{Math.round(data.pattern_memory.similarity * 100)}%</p>
-                            </div>
-                            <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
-                                <motion.div
-                                    initial={{ width: 0 }}
-                                    animate={{ width: `${data.pattern_memory.similarity * 100}%` }}
-                                    transition={{ duration: 1.5 }}
-                                    className="h-full bg-primary shadow-[0_0_10px_rgba(79,140,255,0.5)]"
-                                />
-                            </div>
-                            <p className="text-[10px] text-gray-600 font-bold leading-relaxed">
-                                Identified {data.pattern_memory.match_count} distinct structural similarities in our real-time scam repository.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Right Column: Reasoning & Actions */}
-                <div className="lg:col-span-8 space-y-8">
-                    {/* Cognitive Reasoning Module */}
-                    <div className="glass-panel p-10 relative overflow-hidden group">
-                        <div className="absolute top-0 left-0 w-1 h-full bg-primary opacity-40 group-hover:opacity-100 transition-opacity" />
-                        <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-8 flex items-center gap-2">
-                            <Zap className="w-4 h-4 text-primary" /> Cognitive Reasoning Engine
-                        </h3>
-                        <div className="prose prose-invert max-w-none">
-                            <p className="text-2xl font-medium text-gray-200 leading-[1.6] tracking-tight">
-                                {data.reasoning}
-                            </p>
-                        </div>
-                        <div className="mt-12 pt-8 border-t border-white/5 grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div>
-                                <h4 className="text-[9px] font-black text-danger uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                                    <Target className="w-3 h-3" /> Identified Objectives
-                                </h4>
-                                <div className="space-y-3">
-                                    {data.attack_graph?.map((node, i) => (
-                                        <div key={i} className="flex items-center gap-3 px-4 py-2 bg-danger/5 border border-danger/10 rounded-xl">
-                                            <div className="w-1 h-1 rounded-full bg-danger shadow-[0_0_8px_rgba(255,77,79,0.8)]" />
-                                            <span className="text-[11px] font-black text-white uppercase tracking-wider">{node.label}</span>
-                                        </div>
-                                    ))}
+                    <Card className="bg-zinc-900/10 border-zinc-800/50 shadow-none">
+                        <CardContent className="p-8">
+                            <h4 className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-6 flex items-center gap-2">
+                                <Activity className="w-3.5 h-3.5" /> Meta Parameters
+                            </h4>
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center py-3 border-b border-zinc-800/50 last:border-0">
+                                    <span className="text-[11px] font-semibold text-zinc-500">Vector Type</span>
+                                    <Badge variant="neutral" className="bg-zinc-800 text-zinc-400 border-none">{data.attack_type}</Badge>
+                                </div>
+                                <div className="flex justify-between items-center py-3 border-b border-zinc-800/50 last:border-0">
+                                    <span className="text-[11px] font-semibold text-zinc-500">Pattern Status</span>
+                                    <span className="text-[11px] font-bold text-zinc-300">{data.pattern_memory.status}</span>
+                                </div>
+                                <div className="flex justify-between items-center py-3 border-b border-zinc-800/50 last:border-0">
+                                    <span className="text-[11px] font-semibold text-zinc-500">Memory Sync</span>
+                                    <span className="text-[11px] font-bold text-blue-500">Global Match</span>
                                 </div>
                             </div>
-                            <div>
-                                <h4 className="text-[9px] font-black text-success uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                                    <ShieldCheck className="w-3 h-3" /> Recommended Counters
-                                </h4>
-                                <div className="space-y-4">
-                                    <div className={cn("p-4 rounded-xl border-l-4", isHighRisk ? "bg-danger/10 border-danger" : "bg-success/10 border-success")}>
-                                        <p className="text-xs font-black text-white uppercase mb-1">Defensive Protocol</p>
-                                        <p className="text-[11px] text-gray-400 font-medium leading-relaxed">
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Reasoning Column */}
+                <div className="lg:col-span-8 space-y-8">
+                    <Card className="bg-zinc-900/10 border-zinc-800/60 shadow-none">
+                        <CardContent className="p-10">
+                            <h4 className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-8 flex items-center gap-2">
+                                <Terminal className="w-3.5 h-3.5 text-blue-500" /> Operational Assessment
+                            </h4>
+
+                            <div className="mb-12">
+                                <p className="text-xl text-zinc-300 font-medium leading-[1.8] tracking-tight">
+                                    {data.reasoning}
+                                </p>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-10 border-t border-zinc-800/50">
+                                <div>
+                                    <h5 className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-5 flex items-center gap-2">
+                                        <Target className="w-3.5 h-3.5 text-rose-500" /> Structural Markers
+                                    </h5>
+                                    <div className="space-y-2.5">
+                                        {data.attack_graph?.map((node: any, i: number) => (
+                                            <div key={i} className="flex items-center gap-3 px-4 py-2 bg-black/20 border border-zinc-800/80 rounded-lg">
+                                                <div className="w-1 h-1 rounded-full bg-rose-500/50 shadow-[0_0_8px_rgba(244,63,94,0.4)]" />
+                                                <span className="text-[11px] font-semibold text-zinc-400">{node.label} Trace</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h5 className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-5 flex items-center gap-2">
+                                        <Lock className="w-3.5 h-3.5 text-emerald-500" /> Directive
+                                    </h5>
+                                    <div className={cn("p-5 rounded-lg border-l-2",
+                                        isHighRisk ? "bg-rose-500/5 border-rose-500" :
+                                            isMediumRisk ? "bg-amber-500/5 border-amber-500" :
+                                                "bg-emerald-500/5 border-emerald-500"
+                                    )}>
+                                        <p className="text-[11px] font-bold text-white uppercase mb-1.5">
+                                            {isHighRisk ? "Immediate Block" : isMediumRisk ? "Verification Required" : "Secure"}
+                                        </p>
+                                        <p className="text-[10px] text-zinc-500 leading-relaxed font-medium font-inter">
                                             {isHighRisk
-                                                ? "Execute Emergency Lock: Do not interact with the source. Report to National Cyber Crime portal immediately."
-                                                : "Standard Watch: Maintain digital hygiene and monitor for subsequent related attempts."}
+                                                ? "Critical markers identified in linguistic vector and infrastructure. Propagate block across edge nodes immediately."
+                                                : isMediumRisk
+                                                    ? "Anomalous patterns detected. Perform secondary verification before interaction."
+                                                    : "No verified threat markers observed. Source maintains structural integrity."}
                                         </p>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </CardContent>
+                    </Card>
 
-                    {/* Operational Actions */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <button className="btn-cyber w-full py-6 flex items-center justify-center gap-3 active:scale-[0.98]">
-                            <ShieldAlert className="w-5 h-5" /> Flag as Critical Threat
-                        </button>
-                        <button className="w-full py-6 rounded-[1.25rem] bg-white/5 border border-white/10 text-white font-black text-[11px] uppercase tracking-[0.2em] hover:bg-white/10 transition-all flex items-center justify-center gap-3 active:scale-[0.98]">
-                            <Target className="w-5 h-5" /> Trace Source Origin
-                        </button>
+                    {/* Operational Toolbar */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Button className="py-5 h-auto text-xs font-semibold gap-3 bg-zinc-100 text-black hover:bg-white rounded-xl">
+                            <Flag className="w-4 h-4" /> Report to Global Intelligence
+                        </Button>
+                        <Button variant="secondary" className="py-5 h-auto text-xs font-semibold gap-3 bg-zinc-800/50 border-zinc-700 hover:bg-zinc-700/50 rounded-xl">
+                            <Eye className="w-4 h-4" /> Export Verification Chain
+                        </Button>
                     </div>
                 </div>
             </div>

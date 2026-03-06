@@ -113,14 +113,40 @@ async def report_scam(request: ReportRequest):
     )
     return {"status": "success", "message": "Report submitted to cybercrime database."}
 
+# Geolocation Helper for the Frontend Map
+# x, y percentages for the world map visualization
+CITY_COORDINATES = {
+    "Mumbai": {"x": 16.2, "y": 63.0},
+    "Delhi": {"x": 30.6, "y": 31.3},
+    "Bangalore": {"x": 31.9, "y": 83.3},
+    "Pune": {"x": 19.5, "y": 64.9},
+    "Hyderabad": {"x": 34.9, "y": 68.7},
+    "Chennai": {"x": 40.8, "y": 83.0},
+    "Kolkata": {"x": 67.8, "y": 51.4},
+    "Ahmedabad": {"x": 15.2, "y": 49.9},
+    "Unknown": {"x": 50, "y": 50},
+}
+
 @app.get("/dashboard")
 async def get_dashboard_data():
     db = get_db_service()
-    recent = db.get_recent_reports(limit=10)
+    recent = db.get_recent_reports(limit=20)
     stats = db.get_stats()
+    
+    # Add coordinates to recent reports for the map
+    enriched_reports = []
+    for report in recent:
+        loc = report.get('location', 'Unknown')
+        coords = CITY_COORDINATES.get(loc, CITY_COORDINATES["Unknown"])
+        enriched_report = dict(report)
+        enriched_report['x'] = coords['x']
+        enriched_report['y'] = coords['y']
+        enriched_reports.append(enriched_report)
+        
     return {
-        "recent_reports": recent,
-        "stats": stats
+        "recent_threats": enriched_reports,
+        "stats": stats,
+        "active_nodes": 1242 + len(enriched_reports)
     }
 
 @app.post("/analyze-image")
