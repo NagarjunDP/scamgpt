@@ -1,31 +1,41 @@
 "use client";
 
 import ChatInterface from "@/components/ChatInterface";
-import { motion } from "framer-motion";
-import { Brain, Info } from "lucide-react";
+import { Brain, ShieldCheck } from "lucide-react";
 
 export default function ChatPage() {
     return (
-        <div className="max-w-7xl mx-auto px-6 py-8 h-[calc(100vh-80px)] flex flex-col">
-            <div className="flex items-center justify-between mb-6">
-                <div>
-                    <h1 className="text-3xl font-display font-bold text-white flex items-center gap-3">
-                        <Brain className="w-8 h-8 text-[#00d4ff]" />
-                        ScamGPT <span className="text-[#00d4ff]">Intelligence Chat</span>
-                    </h1>
-                    <p className="text-gray-400 text-sm mt-1">Direct access to cognitive cybersecurity reasoning.</p>
+        <div className="h-screen flex flex-col p-6 overflow-hidden">
+            <div className="flex items-center justify-between mb-6 shrink-0">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
+                        <Brain className="w-7 h-7 text-primary" />
+                    </div>
+                    <div>
+                        <h1 className="text-2xl font-display font-bold text-white leading-tight">
+                            AI Security Assistant
+                        </h1>
+                        <div className="flex items-center gap-2 mt-0.5">
+                            <div className="status-dot bg-success" />
+                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Cognitive Engine Online</p>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="hidden lg:flex items-center gap-4 p-4 glass-card border-emerald-500/20 bg-emerald-500/5">
-                    <Info className="w-5 h-5 text-emerald-400" />
-                    <div className="text-xs">
-                        <p className="text-white font-bold">Safe Mode Active</p>
-                        <p className="text-gray-400">All data is anonymized before processing.</p>
+                <div className="hidden md:flex items-center gap-6">
+                    <div className="flex flex-col items-end">
+                        <span className="text-[10px] font-bold text-gray-600 uppercase tracking-widest">Security Protocol</span>
+                        <span className="text-xs font-bold text-white uppercase">End-to-End Encrypted</span>
+                    </div>
+                    <div className="w-px h-8 bg-white/5" />
+                    <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10">
+                        <ShieldCheck className="w-4 h-4 text-success" />
+                        <span className="text-xs font-bold text-white uppercase">Safe Mode</span>
                     </div>
                 </div>
             </div>
 
-            <div className="flex-1 min-h-0">
+            <div className="flex-1 min-h-0 bg-[#0B0F19]/20 rounded-2xl overflow-hidden border border-white/5 shadow-2xl">
                 <ChatInterface />
             </div>
         </div>

@@ -1,163 +1,197 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { ShieldAlert, Globe, Activity, Zap, AlertTriangle, ShieldCheck, TrendingUp, BarChart3, Map as MapIcon, RefreshCw } from "lucide-react";
-import { cn } from "@/lib/utils";
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+    Activity,
+    MapPin,
+    Clock,
+    ShieldAlert,
+    ExternalLink,
+    Zap,
+    Cpu,
+    Globe
+} from 'lucide-react';
 
-interface Report {
-    id: number;
-    type: string;
-    target: string;
-    description: string;
-    risk_score: number;
-    location: string;
-    timestamp: string;
-}
+const INITIAL_THREATS = [
+    { id: 1, type: 'Phishing', target: 'secure-amazon-refund.xyz', location: 'Mumbai, IN', time: 'Just now', severity: 'High' },
+    { id: 2, type: 'UPI Fraud', target: 'pay-merchant-442@okicici', location: 'Delhi, IN', time: '2 mins ago', severity: 'Critical' },
+    { id: 3, type: 'SMS Scam', target: 'HDFC KYV Expired', location: 'Bangalore, IN', time: '5 mins ago', severity: 'Medium' },
+    { id: 4, type: 'Brand Impersonation', target: 'login-fedex-tracking.net', location: 'Hyderabad, IN', time: '12 mins ago', severity: 'High' },
+    { id: 5, type: 'Credential Theft', target: 'microsoft-office-v3.com', location: 'Chennai, IN', time: '18 mins ago', severity: 'Critical' },
+];
 
-export default function LiveThreatsPage() {
-    const [reports, setReports] = useState<Report[]>([]);
-    const [stats, setStats] = useState<Record<string, number>>({});
-    const [loading, setLoading] = useState(true);
+const THREAT_TYPES = ['Phishing', 'UPI Fraud', 'SMS Scam', 'Brand Impersonation', 'Credential Theft'];
+const LOCATIONS = ['Mumbai, IN', 'Delhi, IN', 'Bangalore, IN', 'Chennai, IN', 'Kolkata, IN', 'Pune, IN', 'Ahmedabad, IN'];
 
-    const fetchData = async () => {
-        try {
-            const response = await fetch("http://localhost:8000/dashboard");
-            const data = await response.json();
-            setReports(data.recent_reports || []);
-            setStats(data.stats || {});
-        } catch (error) {
-            console.error("Dashboard error:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+export default function LiveThreatFeed() {
+    const [threats, setThreats] = useState(INITIAL_THREATS);
 
     useEffect(() => {
-        fetchData();
-        const interval = setInterval(fetchData, 10000);
+        const interval = setInterval(() => {
+            const newThreat = {
+                id: Date.now(),
+                type: THREAT_TYPES[Math.floor(Math.random() * THREAT_TYPES.length)],
+                target: `threat-vector-${Math.floor(Math.random() * 999)}.net`,
+                location: LOCATIONS[Math.floor(Math.random() * LOCATIONS.length)],
+                time: 'Just now',
+                severity: Math.random() > 0.7 ? 'Critical' : (Math.random() > 0.4 ? 'High' : 'Medium')
+            };
+
+            setThreats(prev => [newThreat, ...prev.slice(0, 14)]);
+        }, 4000);
+
         return () => clearInterval(interval);
     }, []);
 
-    const totalThreats = Object.values(stats).reduce((a, b) => a + b, 0);
-
     return (
-        <div className="flex-1 overflow-y-auto p-8 space-y-8 bg-[#0B0F19]">
-            {/* Header */}
-            <div className="flex justify-between items-end">
-                <div>
-                    <h1 className="text-3xl font-display font-bold tracking-tight">Threat Intelligence Dashboard</h1>
-                    <p className="text-gray-500 mt-1">Real-time global scam monitoring and cognitive threat analysis.</p>
-                </div>
-                <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Global Watch Active</span>
-                </div>
-            </div>
+        <div className="p-10 max-w-7xl mx-auto space-y-12 pb-32">
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border-b border-white/5 pb-12 relative"
+            >
+                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] translate-x-1/2 -translate-y-1/2 pointer-events-none" />
 
-            {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[
-                    { label: "Total Blocked", value: totalThreats + 1240, icon: ShieldCheck, color: "text-primary" },
-                    { label: "Active Threats", value: reports.length, icon: Activity, color: "text-warning" },
-                    { label: "Global Match", value: "94.2%", icon: Zap, color: "text-blue-400" },
-                    { label: "Uptime", value: "99.99%", icon: TrendingUp, color: "text-emerald-400" },
-                ].map((stat, i) => (
-                    <motion.div
-                        key={stat.label}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.1 }}
-                        className="glass-card p-6 flex items-center justify-between border-white/5"
-                    >
-                        <div>
-                            <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">{stat.label}</div>
-                            <div className={cn("text-2xl font-display font-bold", stat.color)}>{stat.value}</div>
-                        </div>
-                        <div className={cn("p-3 rounded-xl bg-white/5", stat.color)}>
-                            <stat.icon size={20} />
-                        </div>
-                    </motion.div>
-                ))}
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Heatmap Visualization (Simulation) */}
-                <div className="lg:col-span-2 space-y-4">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-sm font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2">
-                            <MapIcon size={14} /> Global Scam Heatmap
-                        </h2>
-                        <button className="text-[10px] font-bold text-primary hover:underline uppercase">Enlarge Map</button>
+                <div className="relative">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-4">
+                        <Activity className="w-3 h-3 animate-pulse" /> Live Monitoring Active
                     </div>
-                    <div className="aspect-video glass-card overflow-hidden relative border-white/5 bg-black/40">
-                        <div className="absolute inset-0 opacity-20 bg-[url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg')] bg-no-repeat bg-center bg-contain filter invert" />
+                    <h1 className="text-5xl font-display font-black text-white tracking-tighter leading-none mb-3">
+                        Global <span className="text-primary text-glow">Intelligence</span> Feed
+                    </h1>
+                    <p className="text-gray-500 font-bold uppercase text-[10px] tracking-[0.2em] max-w-xl">Real-time heuristic tracking of multi-vector cyber threats across global networks.</p>
+                </div>
 
-                        {/* Simulated Pulse Points */}
-                        <div className="absolute top-1/3 left-1/4 w-3 h-3 bg-red-500 rounded-full animate-ping" />
-                        <div className="absolute top-1/2 left-1/2 w-4 h-4 bg-warning rounded-full animate-ping" />
-                        <div className="absolute top-1/4 left-2/3 w-2 h-2 bg-red-500 rounded-full animate-ping" />
-                        <div className="absolute bottom-1/3 left-1/2 w-3 h-3 bg-primary rounded-full animate-ping" />
+                <div className="flex gap-4 relative">
+                    <div className="glass-card px-6 py-4 border-success/20 bg-success/[0.02] flex items-center gap-4">
+                        <div className="relative">
+                            <div className="status-dot bg-success" />
+                            <div className="absolute inset-0 bg-success blur-sm animate-pulse" />
+                        </div>
+                        <span className="text-xs font-black text-white uppercase">Nodes Synced</span>
+                    </div>
+                </div>
+            </motion.div>
 
-                        <div className="absolute bottom-4 left-4 p-4 glass-card bg-black/60 border-white/10 space-y-2">
-                            <div className="text-[10px] font-bold text-white uppercase tracking-widest">Active Vectors</div>
-                            <div className="flex gap-4">
-                                <div className="flex items-center gap-1.5">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                                    <span className="text-[10px] text-gray-400">Critical Phishing</span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-warning" />
-                                    <span className="text-[10px] text-gray-400">Mass SMS</span>
-                                </div>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                {/* Stats Sidebar */}
+                <div className="lg:col-span-3 space-y-8">
+                    <div className="glass-panel p-8 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                            <Zap className="w-20 h-20" />
+                        </div>
+                        <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-8">Activity Metrics</h3>
+                        <div className="space-y-8">
+                            <div>
+                                <p className="text-4xl font-display font-black text-white tracking-tighter mb-1">1,242</p>
+                                <p className="text-[9px] text-primary font-black uppercase tracking-widest">Threats Neutralized</p>
+                            </div>
+                            <div>
+                                <p className="text-4xl font-display font-black text-white tracking-tighter mb-1">42</p>
+                                <p className="text-[9px] text-warning font-black uppercase tracking-widest">Active Operations</p>
                             </div>
                         </div>
+                        <div className="mt-10 pt-8 border-t border-white/5">
+                            <button className="w-full py-4 btn-cyber text-[10px] shadow-primary/10">Download Intelligence Report</button>
+                        </div>
+                    </div>
+
+                    <div className="glass-panel p-8 space-y-6">
+                        <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] flex items-center gap-2">
+                            <Globe className="w-4 h-4 text-primary" /> Region Status
+                        </h3>
+                        <div className="space-y-3">
+                            {[
+                                { label: 'Asia-South', status: 'Optimal', load: '12%' },
+                                { label: 'Europe-West', status: 'Peak Load', load: '84%', warning: true },
+                                { label: 'US-East', status: 'Optimal', load: '45%' },
+                            ].map((region, idx) => (
+                                <div key={idx} className="bg-white/[0.02] p-4 rounded-xl border border-white/5 group hover:border-white/10 transition-colors">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <span className="text-[10px] font-black text-white uppercase">{region.label}</span>
+                                        <span className={cn("text-[8px] font-black uppercase", region.warning ? "text-warning" : "text-success")}>{region.status}</span>
+                                    </div>
+                                    <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                                        <div className={cn("h-full", region.warning ? "bg-warning" : "bg-success")} style={{ width: region.load }} />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
-                {/* Live Feed */}
-                <div className="space-y-4">
-                    <h2 className="text-sm font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2">
-                        <Activity size={14} /> Live Threat Feed
-                    </h2>
-                    <div className="glass-card overflow-hidden flex flex-col h-[400px] border-white/5 bg-black/20">
-                        <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide">
-                            {reports.map((report, i) => (
+                {/* Live List */}
+                <div className="lg:col-span-9 space-y-6">
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-[11px] font-black text-gray-500 uppercase tracking-[0.4em]">Inbound Threat Vectors</h2>
+                        <div className="text-[9px] font-black text-primary/50 uppercase tracking-widest animate-pulse">Scanning Global Ports...</div>
+                    </div>
+
+                    <div className="space-y-4">
+                        <AnimatePresence mode="popLayout">
+                            {threats.map((threat) => (
                                 <motion.div
-                                    key={report.id}
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    className="p-3 rounded-xl bg-white/5 border border-white/5 hover:border-white/10 transition-all group"
+                                    key={threat.id}
+                                    layout
+                                    initial={{ opacity: 0, x: -20, scale: 0.98 }}
+                                    animate={{ opacity: 1, x: 0, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
+                                    className="glass-panel p-6 hover:border-primary/30 transition-all duration-300 flex flex-col md:flex-row items-center gap-8 relative group overflow-hidden"
                                 >
-                                    <div className="flex justify-between items-start mb-2">
-                                        <div className="px-2 py-0.5 rounded-md bg-white/5 text-[9px] font-bold text-gray-400 uppercase border border-white/5">
-                                            {report.type}
-                                        </div>
-                                        <div className="text-[9px] font-mono text-gray-600">
-                                            {new Date(report.timestamp).toLocaleTimeString()}
-                                        </div>
+                                    <div className="absolute top-0 left-0 w-1 h-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                                    <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-lg",
+                                        threat.severity === 'Critical' ? 'bg-danger/20 text-danger shadow-danger/10' :
+                                            threat.severity === 'High' ? 'bg-warning/20 text-warning shadow-warning/10' : 'bg-primary/20 text-primary shadow-primary/10'
+                                    )}>
+                                        <ShieldAlert className="w-7 h-7" />
                                     </div>
-                                    <div className="text-xs font-bold text-gray-200 truncate group-hover:text-primary transition-colors">{report.target}</div>
-                                    <div className="flex items-center justify-between mt-2">
-                                        <div className="text-[10px] text-gray-500">{report.location}</div>
-                                        <div className={cn(
-                                            "text-[10px] font-bold",
-                                            report.risk_score > 0.8 ? "text-danger" : "text-warning"
+
+                                    <div className="flex-1 text-center md:text-left space-y-1">
+                                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                                            <span className={cn("text-[10px] font-black uppercase tracking-[0.2em]",
+                                                threat.severity === 'Critical' ? 'text-danger' :
+                                                    threat.severity === 'High' ? 'text-warning' : 'text-primary'
+                                            )}>{threat.type}</span>
+                                            <span className="text-[10px] text-white/20 hidden md:block">|</span>
+                                            <span className="text-[10px] text-gray-600 font-black uppercase tracking-widest flex items-center gap-1.5">
+                                                <Clock className="w-3.5 h-3.5" />
+                                                {threat.time}
+                                            </span>
+                                        </div>
+                                        <p className="text-xl font-display font-bold text-white group-hover:text-primary transition-colors tracking-tight">{threat.target}</p>
+                                    </div>
+
+                                    <div className="flex flex-col md:items-end gap-2 shrink-0 md:text-right">
+                                        <div className="flex items-center gap-2 text-gray-500 font-bold uppercase text-[9px] tracking-widest">
+                                            <MapPin className="w-3.5 h-3.5" />
+                                            {threat.location}
+                                        </div>
+                                        <div className={cn("px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-lg",
+                                            threat.severity === 'Critical' ? 'bg-danger text-white shadow-danger/20' :
+                                                threat.severity === 'High' ? 'bg-warning text-black shadow-warning/20' : 'bg-primary text-white shadow-primary/20'
                                         )}>
-                                            {Math.round(report.risk_score * 100)}% RISK
+                                            {threat.severity} Priority
                                         </div>
                                     </div>
+
+                                    <button className="p-3 rounded-2xl bg-white/[0.03] border border-white/5 text-gray-600 hover:text-white hover:border-primary/40 transition-all">
+                                        <ExternalLink className="w-5 h-5" />
+                                    </button>
                                 </motion.div>
                             ))}
-                        </div>
-                        <div className="p-4 bg-black/40 border-t border-white/5">
-                            <button onClick={fetchData} className="w-full btn-primary py-2 text-xs">
-                                <RefreshCw size={12} className="mr-2" /> Refresh Feed
-                            </button>
-                        </div>
+                        </AnimatePresence>
                     </div>
                 </div>
             </div>
         </div>
     );
+}
+
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+function cn(...inputs: ClassValue[]) {
+    return twMerge(clsx(inputs));
 }
