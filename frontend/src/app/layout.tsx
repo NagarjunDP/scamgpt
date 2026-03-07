@@ -1,15 +1,13 @@
 import type { Metadata } from "next";
 import Sidebar from "@/components/layout/Sidebar";
 import Header from "@/components/layout/Header";
-<<<<<<< HEAD
-=======
 import { NotificationProvider } from "@/lib/NotificationContext";
->>>>>>> origin/min
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "ScamGPT | Cybersecurity AI Platform",
-  description: "Enterprise-grade cognitive AI security platform for real-time scam detection.",
+  description:
+    "Enterprise-grade cognitive AI security platform for real-time scam detection.",
 };
 
 export default function RootLayout({
@@ -20,19 +18,6 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark scroll-smooth">
       <body className="antialiased flex h-screen bg-[#0B0F19] overflow-hidden">
-<<<<<<< HEAD
-        {/* Strict SaaS Layout Shell */}
-        <Sidebar />
-
-        <div className="flex-1 flex flex-col min-w-0">
-          <Header />
-          <main className="flex-1 overflow-y-auto scrollbar-thin bg-neural-grid">
-            <div className="w-full h-full max-w-[1600px] mx-auto">
-              {children}
-            </div>
-          </main>
-        </div>
-=======
         <NotificationProvider>
           {/* Strict SaaS Layout Shell */}
           <Sidebar />
@@ -46,7 +31,6 @@ export default function RootLayout({
             </main>
           </div>
         </NotificationProvider>
->>>>>>> origin/min
       </body>
     </html>
   );
