@@ -1,15 +1,7 @@
-// DEMO ONLY: Putting an API key in a Chrome extension is NOT secure.
-// Anyone can extract it and burn your quota/billing.
-// Rotate your key after the demo and DO NOT commit it to GitHub.
-
 const scanBtn = document.getElementById("scanBtn");
 const result = document.getElementById("result");
 
-// Paste your Gemini API key here locally (do NOT commit):
-const GOOGLE_API_KEY = "AIzaSyAMmixT9lIqaI76ZjFuSbBQaMk7NNXu7B0";
-
-// Model with quota (per your note)
-const GEMINI_MODEL = "gemini-flash-latest";
+const BACKEND_URL = "http://localhost:8000/analyze";
 
 function setResult(text) {
   result.innerText = text;
@@ -31,84 +23,52 @@ function normalizeVerdict(verdict, riskScore) {
   return "LEGIT";
 }
 
-async function geminiScanUrl(url) {
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(
-    GEMINI_MODEL
-  )}:generateContent?key=${encodeURIComponent(GOOGLE_API_KEY)}`;
+function extractVerdictFromBackend(data) {
+  // Backend may return different fields; handle safely.
+  const risk = clamp01(
+    data?.risk_score ?? data?.probability ?? data?.score ?? 0.5
+  );
 
-  const prompt = `
-You are ScamGPT. Classify the following URL as LEGIT, SUSPICIOUS, or SCAM.
+  // If backend explicitly gives a verdict, use it; else derive from risk.
+  const verdictRaw = data?.verdict ?? data?.prediction_label ?? data?.threat_label;
+  const verdict = normalizeVerdict(verdictRaw, risk);
 
-Return STRICT JSON ONLY (no markdown, no extra text), exactly:
-{
-  "verdict": "LEGIT" | "SUSPICIOUS" | "SCAM",
-  "risk_score": number,
-  "reason": string
+  const reason =
+    String(
+      data?.reason ||
+        data?.reasoning ||
+        data?.explanation ||
+        data?.message ||
+        ""
+    ).trim() || "No explanation returned (backend online scan).";
+
+  return { verdict, risk_score: risk, reason };
 }
 
-Rules:
-- risk_score must be between 0 and 1 (1 = very likely scam)
-- reason must be 1-2 short sentences max
-- If uncertain, choose SUSPICIOUS.
-
-Use URL-only heuristics:
-- typosquatting/lookalike domains
-- excessive hyphens/subdomains
-- punycode (xn--)
-- suspicious words: kyc, verify, login, secure, bank, support, reward, urgent
-- non-https where sensitive actions are implied
-
-URL: ${url}
-`.trim();
-
-  const body = {
-    contents: [{ role: "user", parts: [{ text: prompt }] }],
-    generationConfig: { temperature: 0.2, maxOutputTokens: 180 },
-  };
-
-  const res = await fetch(endpoint, {
+async function backendScanUrl(url) {
+  const res = await fetch(BACKEND_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ input_text: url, type: "url" }),
   });
 
   const raw = await res.text();
-  if (!res.ok) throw new Error(`Gemini API error (${res.status}): ${raw}`);
+  if (!res.ok) throw new Error(`Backend error (${res.status}): ${raw}`);
 
-  const data = JSON.parse(raw);
-  const modelText =
-    data?.candidates?.[0]?.content?.parts?.map((p) => p.text).join("") || "";
-
-  if (!modelText) throw new Error("Empty response from Gemini.");
-
-  let parsed;
+  let data;
   try {
-    parsed = JSON.parse(modelText);
+    data = JSON.parse(raw);
   } catch {
-    // Fallback if Gemini doesn't obey JSON strictly
-    return {
-      verdict: "SUSPICIOUS",
-      risk_score: 0.5,
-      reason: modelText.slice(0, 160),
-    };
+    throw new Error(`Backend returned non-JSON: ${raw.slice(0, 200)}`);
   }
 
-  const risk_score = clamp01(parsed.risk_score);
-  const verdict = normalizeVerdict(parsed.verdict, risk_score);
-  const reason = String(parsed.reason || "").trim() || "No reason provided.";
-
-  return { verdict, risk_score, reason };
+  return extractVerdictFromBackend(data);
 }
 
 scanBtn.addEventListener("click", async () => {
-  setResult("Analyzing with ScamGPT AI...");
+  setResult("Analyzing with ScamGPT (local backend)...");
 
   try {
-    if (!GOOGLE_API_KEY || GOOGLE_API_KEY.includes("PASTE_")) {
-      setResult("Missing GOOGLE_API_KEY. Paste your key in popup.js (demo only).");
-      return;
-    }
-
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     const url = tab?.url;
 
@@ -122,7 +82,7 @@ scanBtn.addEventListener("click", async () => {
       return;
     }
 
-    const out = await geminiScanUrl(url);
+    const out = await backendScanUrl(url);
 
     setResult(
       `Verdict: ${out.verdict}\n` +
