@@ -4,28 +4,19 @@
   "description": "AI-powered scam detection while browsing the web.",
   "version": "1.0",
 
-  "permissions": [
-    "activeTab",
-    "storage",
-    "scripting"
-  ],
+  "permissions": ["activeTab", "storage", "scripting"],
 
   "host_permissions": [
-    "<all_urls>"
+    "<all_urls>",
+    "http://localhost:8000/*",
+    "http://127.0.0.1:8000/*"
   ],
 
-  "background": {
-    "service_worker": "background.js"
-  },
+  "background": { "service_worker": "background.js" },
 
-  "action": {
-    "default_popup": "popup.html"
-  },
+  "action": { "default_popup": "popup.html" },
 
   "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"]
-    }
+    { "matches": ["<all_urls>"], "js": ["content.js"] }
   ]
 }
