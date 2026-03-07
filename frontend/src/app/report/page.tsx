@@ -1,6 +1,4 @@
 'use client';
-
-<<<<<<< HEAD
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
@@ -23,7 +21,6 @@ export default function ReportScam() {
         e.preventDefault();
         setStatus('submitting');
         setTimeout(() => setStatus('success'), 1500);
-=======
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldAlert, Upload, Send, MapPin, AlertTriangle, FileText, ChevronDown, CheckCircle, Clock, Globe, Award, Shield } from 'lucide-react';
@@ -144,12 +141,12 @@ export default function ReportScam() {
             setErrorMsg('Failed to connect to the Scam Intelligence Network.');
             setStatus('error');
         }
->>>>>>> origin/min
+
     };
 
     if (status === 'success') {
         return (
-<<<<<<< HEAD
+
             <div className="p-8 md:p-20 flex items-center justify-center animate-fade-in text-center h-[calc(100vh-140px)]">
                 <div className="max-w-md">
                     <div className="w-16 h-16 bg-emerald-500/5 border border-emerald-500/10 rounded-xl flex items-center justify-center mx-auto mb-8">
@@ -163,7 +160,7 @@ export default function ReportScam() {
                         Report New Incident
                     </Button>
                 </div>
-=======
+
             <div className="min-h-screen bg-black pt-24 pb-12 px-4 selection:bg-[#ff0033]/30 selection:text-white flex flex-col items-center">
                 <motion.div 
                     initial={{ opacity: 0, scale: 0.9 }}
@@ -282,13 +279,13 @@ export default function ReportScam() {
                         </div>
                     </motion.div>
                 )}
->>>>>>> origin/min
+
             </div>
         );
     }
 
     return (
-<<<<<<< HEAD
+
         <div className="p-8 md:p-12 animate-fade-in max-w-4xl mx-auto py-16">
             <div className="mb-12">
                 <Badge variant="neutral" className="mb-4 bg-zinc-800/50">Community Intel</Badge>
@@ -346,7 +343,7 @@ export default function ReportScam() {
                     </form>
                 </CardContent>
             </Card>
-=======
+
         <div className="min-h-screen bg-black pt-24 pb-12 px-4 selection:bg-[#ff0033]/30 selection:text-white">
             <div className="max-w-3xl mx-auto">
                 <div className="text-center mb-10">
@@ -512,7 +509,6 @@ export default function ReportScam() {
                     </div>
                 </motion.div>
             </div>
->>>>>>> origin/min
         </div>
     );
 }
