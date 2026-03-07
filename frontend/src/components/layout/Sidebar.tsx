@@ -10,6 +10,11 @@ import {
     ShieldAlert,
     Activity,
     MessageSquare,
+<<<<<<< HEAD
+=======
+    History,
+    Users,
+>>>>>>> origin/min
     Info,
     ChevronLeft,
     Shield,
@@ -26,6 +31,11 @@ const navItems = [
     { name: 'Threat Intel', href: '/analyzer', icon: Activity },
     { name: 'Live Feed', href: '/live-threats', icon: ShieldAlert },
     { name: 'Report Scam', href: '/report', icon: MessageSquare },
+<<<<<<< HEAD
+=======
+    { name: 'History', href: '/history', icon: History },
+    { name: 'Community', href: '/community', icon: Users },
+>>>>>>> origin/min
     { name: 'About', href: '/about', icon: Info },
 ];
 
